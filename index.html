@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>游戏运营数据分析看板</title>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{font-family:"Microsoft YaHei",sans-serif;background:#0f1420;color:#e8eaf0;padding:20px}
+  .wrap{max-width:1200px;margin:auto}
+  h1{font-size:20px;margin-bottom:4px}.sub{color:#7a8499;font-size:12px;margin-bottom:16px}
+  .kpis{display:grid;grid-template-columns:repeat(6,1fr);gap:12px;margin-bottom:16px}
+  .kpi{background:#1a2233;border:1px solid #263149;border-radius:10px;padding:14px}
+  .kpi .lab{font-size:12px;color:#8b96ac;margin-bottom:6px}.kpi .val{font-size:20px;font-weight:700}
+  .kpi .delta{font-size:11px;margin-top:4px}.up{color:#ff5c7a}.down{color:#37d399}
+  .grid{display:grid;grid-template-columns:1.4fr 1fr;gap:12px;margin-bottom:16px}
+  .card{background:#1a2233;border:1px solid #263149;border-radius:10px;padding:16px}
+  .card h3{font-size:14px;margin-bottom:12px;color:#cdd6ea}
+  table{width:100%;border-collapse:collapse;font-size:12.5px}
+  th,td{padding:7px 6px;text-align:center;border-bottom:1px solid #263149}
+  th{color:#8b96ac;font-weight:400}
+  td:first-child,th:first-child{text-align:left}
+  .seg{display:flex;flex-direction:column;gap:10px}
+  .segrow{display:flex;align-items:center;gap:10px;font-size:12.5px}
+  .segrow .nm{width:72px}.segbar{flex:1;background:#263149;border-radius:4px;height:16px;overflow:hidden}
+  .segbar i{display:block;height:16px}.segrow b{width:120px;text-align:right;color:#8b96ac;font-weight:400}
+  .risk{font-size:12px;background:#241c26;border-left:3px solid #f5a623;padding:8px 10px;border-radius:4px;margin-bottom:8px}
+  .note{font-size:11px;color:#5c6780;margin-top:8px}
+  @media(max-width:900px){.kpis{grid-template-columns:repeat(2,1fr)}.grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>游戏运营数据分析看板</h1>
+  <div class="sub">休闲放置类手游 · 近90天运营数据（演示数据，指标口径可对齐真实数仓/ThinkingData导出）</div>
+
+  <div class="kpis" id="kpis"></div>
+
+  <div class="grid">
+    <div class="card"><h3>DAU / 新增用户趋势</h3><div id="dauChart"></div></div>
+    <div class="card"><h3>每日流水与付费率</h3><div id="revChart"></div></div>
+  </div>
+
+  <div class="grid">
+    <div class="card">
+      <h3>新增用户留存矩阵（Cohort）</h3>
+      <table id="cohort"><thead><tr><th>新增周</th><th>新增数</th><th>D1</th><th>D3</th><th>D7</th><th>D14</th><th>D30</th></tr></thead><tbody></tbody></table>
+      <div class="note">颜色越深留存越高；D7低于25%需排查新手期卡点</div>
+    </div>
+    <div class="card">
+      <h3>付费用户分层（近30天）</h3>
+      <div class="seg" id="seg"></div>
+      <div class="note">鲸鱼（≥2000元）/ 海豚（300-2000）/ 小鱼（&lt;300）/ 非付费</div>
+    </div>
+  </div>
+
+  <div class="card" style="margin-bottom:16px">
+    <h3>高流失风险用户预警（自动圈选：鲸鱼海豚 + 近7日未登录）</h3>
+    <div id="risks"></div>
+  </div>
+</div>
+
+<script>
+function rng(seed){return function(){seed|=0;seed=seed+0x6D2B79F5|0;let t=Math.imul(seed^seed>>>15,1|seed);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
+const rnd=rng(9981);
+const DAYS=90, today=new Date('2026-09-30');
+// 基础盘：DAU缓降后靠活动拉升；周末上浮
+const data=[];
+let dau=8200;
+for(let i=DAYS-1;i>=0;i--){
+  const d=new Date(today);d.setDate(d.getDate()-i);
+  const wk=[0,6].includes(d.getDay());
+  const trend=-0.9+Math.sin(i/11)*18+(i<20?i*2.2:0); // 近期活动拉升
+  dau=Math.round(Math.max(6000,dau+trend+(wk?350:0)+(rnd()-0.5)*260));
+  const nu=Math.round(500+rnd()*420+(wk?120:0)+(i<20?i*6:0));
+  const payRate=(2.9+rnd()*1.1+(i<20?0.5:0))/100;
+  const payers=Math.round(dau*payRate);
+  const arppu=52+rnd()*26+(i%14<2?40:0); // 双周活动日ARPPU抬升
+  const revenue=Math.round(payers*arppu);
+  data.push({date:d.toISOString().slice(0,5)+d.toISOString().slice(5,10),dau,nu,payers,payRate,revenue});
+}
+
+function avg(k,n){const s=data.slice(-n);return s.reduce((a,x)=>a+x[k],0)/n}
+const last7=avg('dau',7),prev7=avg('dau',14)/1, _prev=data.slice(-14,-7).reduce((a,x)=>a+x.dau,0)/7;
+const rev30=data.slice(-30).reduce((a,x)=>a+x.revenue,0);
+const payers30=data.slice(-30).reduce((a,x)=>a+x.payers,0);
+const dau30=avg('dau',30);
+// LTV粗算：近30天流水/近30天新增（简化口径，演示）
+const ltv=rev30/data.slice(-30).reduce((a,x)=>a+x.nu,0);
+
+document.getElementById('kpis').innerHTML=[
+ ['DAU(近7日均)',Math.round(last7).toLocaleString(),((last7-_prev)/_prev*100)],
+ ['日均新增',Math.round(avg('nu',7)).toLocaleString(),null],
+ ['付费率',(avg('payRate',7)*100).toFixed(2)+'%',null],
+ ['ARPPU','¥'+Math.round(avg('revenue',7)/avg('payers',7)),null],
+ ['30天流水','¥'+(rev30/10000).toFixed(1)+'万',null],
+ ['新增LTV(30日)','¥'+ltv.toFixed(1),null]
+].map(([l,v,d])=>`<div class="kpi"><div class="lab">${l}</div><div class="val">${v}</div>
+${d!==null?`<div class="delta ${d>=0?'up':'down'}">${d>=0?'▲':'▼'} ${Math.abs(d).toFixed(1)}% 环比</div>`:''}</div>`).join('');
+
+function lineChart(el,series,w,h,colors){
+  const W=w,H=h,L=44,B=24,T=10,R=10;
+  const all=series.flatMap(s=>s.data),max=Math.max(...all)*1.05;
+  const X=i=>L+i*(W-L-R)/(series[0].data.length-1),Y=v=>T+(H-T-B)*(1-v/max);
+  let svg='';
+  [0,.25,.5,.75,1].forEach(g=>{const y=Y(max*g);svg+=`<line x1="${L}" y1="${y}" x2="${W-R}" y2="${y}" stroke="#263149"/><text x="4" y="${y+4}" font-size="9" fill="#5c6780">${Math.round(max*g/1000)}k</text>`});
+  [0,.33,.66,1].forEach(g=>{const i=Math.round(g*(series[0].data.length-1));svg+=`<text x="${X(i)}" y="${H-6}" font-size="9" fill="#5c6780" text-anchor="middle">${data[i].date.slice(5)}</text>`});
+  series.forEach(s=>{
+    const p=s.data.map((v,i)=>(i?'L':'M')+X(i).toFixed(1)+' '+Y(v).toFixed(1)).join(' ');
+    svg+=`<path d="${p}" fill="none" stroke="${s.color}" stroke-width="1.8"/>`;
+  });
+  el.innerHTML=`<svg viewBox="0 0 ${W} ${H}" width="100%">${svg}</svg>`;
+}
+lineChart(dauChart,[{data:data.map(x=>x.dau),color:'#5aa7ff'},{data:data.map(x=>x.nu),color:'#37d399'}],680,240);
+lineChart(revChart,[{data:data.map(x=>x.revenue),color:'#ff5c7a'}],680,240);
+
+// 留存矩阵（演示，按周递减+轻微改善）
+const cohorts=[];
+for(let w=8;w>=1;w--){
+  const n=Math.round(3200+rnd()*1500+w*80);
+  const base=40+rnd()*6+(9-w)*0.8;
+  const r=d=>Math.max(8,base-d*4.6-rnd()*3);
+  cohorts.push({label:`W-${w}`,n,r1:r(1),r3:r(3),r7:r(7),r14:r(14),r30:r(30)});
+}
+const cell=v=>{const c=v>35?'#2f6df6':v>25?'#3b4f86':v>15?'#2c3a58':'#232c40';
+  return `<td style="background:${c};border-radius:3px">${v.toFixed(1)}%</td>`};
+document.querySelector('#cohort tbody').innerHTML=cohorts.map(c=>
+ `<tr><td>${c.label}</td><td>${c.n.toLocaleString()}</td>${cell(c.r1)}${cell(c.r3)}${cell(c.r7)}${cell(c.r14)}${cell(c.r30)}</tr>`).join('');
+
+// 付费分层
+const totalUsers=dau30;
+const seg=[
+ ['鲸鱼',0.8,'#ff5c7a',rev30*0.42],
+ ['海豚',6.5,'#f5a623',rev30*0.38],
+ ['小鱼',13.7,'#5aa7ff',rev30*0.20],
+ ['非付费',79.0,'#3a4663',0]
+];
+const maxPct=Math.max(...seg.map(s=>s[1]));
+document.getElementById('seg').innerHTML=seg.map(([n,p,color,rev])=>
+ `<div class="segrow"><span class="nm">${n}</span>
+ <div class="segbar"><i style="width:${p/maxPct*100}%;background:${color}"></i></div>
+ <b>${p}% · 流水¥${(rev/10000).toFixed(1)}万</b></div>`).join('');
+
+// 流失风险名单（演示）
+const risks=[
+ ['UID 88421','鲸鱼','历史充值¥8,640','已9天未登录','发放限时648元礼包+专属客服1v1召回'],
+ ['UID 73092','海豚','历史充值¥1,260','已8天未登录','推送新版本内容+30元回归券'],
+ ['UID 80155','鲸鱼','历史充值¥5,320','已11天未登录','电话回访+补偿月卡，排查流失原因'],
+ ['UID 69577','海豚','历史充值¥760','已7天未登录','定向Push活动开启+好友召回任务'],
+ ['UID 91204','海豚','历史充值¥980','已12天未登录','短信触达回归福利，最后一次召回']
+];
+document.getElementById('risks').innerHTML=risks.map(r=>
+ `<div class="risk"><b>${r[0]}</b>（${r[1]}）｜${r[2]}｜${r[3]} → <span style="color:#f5a623">${r[4]}</span></div>`).join('');
+</script>
+</body>
+</html>
