@@ -6,33 +6,91 @@
 <title>游戏运营数据分析看板</title>
 <style>
   *{margin:0;padding:0;box-sizing:border-box}
-  body{font-family:"Microsoft YaHei",sans-serif;background:#0f1420;color:#e8eaf0;padding:20px}
-  .wrap{max-width:1200px;margin:auto}
-  h1{font-size:20px;margin-bottom:4px}.sub{color:#7a8499;font-size:12px;margin-bottom:16px}
+  svg{font-family:inherit;display:block}
+  body{font-family:"Microsoft YaHei","PingFang SC",sans-serif;color:#e6eaf6;min-height:100vh;
+    padding:20px 20px 36px;background:#0a0e1f;
+    background-image:
+      radial-gradient(1100px 620px at 88% -12%,rgba(167,139,250,.16),transparent 62%),
+      radial-gradient(900px 560px at -8% 18%,rgba(34,211,238,.12),transparent 60%),
+      linear-gradient(160deg,#0a0e1f 0%,#0d1026 52%,#141026 100%);
+    background-attachment:fixed}
+  body::before{content:"";position:fixed;inset:0;pointer-events:none;z-index:0;
+    background-image:radial-gradient(rgba(255,255,255,.05) 1px,transparent 1.4px);
+    background-size:26px 26px}
+  .wrap{max-width:1200px;margin:auto;position:relative;z-index:1}
+  .topbar{display:flex;justify-content:space-between;align-items:flex-end;gap:12px;flex-wrap:wrap;
+    padding:16px 20px;margin-bottom:16px;border:1px solid rgba(255,255,255,.08);border-radius:14px;
+    background:rgba(255,255,255,.04);position:relative;overflow:hidden}
+  .topbar::before{content:"";position:absolute;left:0;top:0;right:0;height:2px;
+    background:linear-gradient(90deg,#22d3ee,#a78bfa 55%,transparent)}
+  .brandrow{display:flex;align-items:center;flex-wrap:wrap;gap:10px}
+  h1.sysname{font-size:21px;font-weight:700;letter-spacing:2px;
+    background:linear-gradient(90deg,#eaf7ff 20%,#a78bfa 90%);
+    -webkit-background-clip:text;background-clip:text;color:transparent;-webkit-text-fill-color:transparent}
+  .tag{font-size:11px;color:#7ee9fb;border:1px solid rgba(34,211,238,.4);border-radius:4px;
+    padding:2px 9px;letter-spacing:3px;background:rgba(34,211,238,.08)}
+  .sub{color:rgba(255,255,255,.5);font-size:12px;margin-top:5px}
+  .period{font-size:12px;color:rgba(255,255,255,.65);padding:5px 13px;border:1px solid rgba(255,255,255,.1);
+    border-radius:999px;background:rgba(34,211,238,.07);white-space:nowrap}
   .kpis{display:grid;grid-template-columns:repeat(6,1fr);gap:12px;margin-bottom:16px}
-  .kpi{background:#1a2233;border:1px solid #263149;border-radius:10px;padding:14px}
-  .kpi .lab{font-size:12px;color:#8b96ac;margin-bottom:6px}.kpi .val{font-size:20px;font-weight:700}
-  .kpi .delta{font-size:11px;margin-top:4px}.up{color:#ff5c7a}.down{color:#37d399}
+  .kpi{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:13px;
+    padding:14px 14px 12px;position:relative;overflow:hidden;
+    transition:background .25s,border-color .25s}
+  .kpi::after{content:"";position:absolute;left:14px;right:14px;bottom:0;height:2px;border-radius:2px;
+    background:linear-gradient(90deg,rgba(34,211,238,.7),transparent)}
+  .kpi:hover{background:rgba(255,255,255,.075);border-color:rgba(34,211,238,.45)}
+  .kpi .val{font-size:24px;font-weight:700;letter-spacing:.5px;white-space:nowrap;
+    font-family:"Bahnschrift","DIN Alternate","Segoe UI","Microsoft YaHei",sans-serif;
+    background:linear-gradient(92deg,#7ee9fb 10%,#a78bfa 90%);
+    -webkit-background-clip:text;background-clip:text;color:transparent;-webkit-text-fill-color:transparent}
+  .kpi .lab{font-size:12px;color:rgba(255,255,255,.55);margin-top:6px}
+  .kpi .delta{font-size:11px;margin-top:3px}
+  .up{color:#ff5c7a}.down{color:#37d399}
   .grid{display:grid;grid-template-columns:1.4fr 1fr;gap:12px;margin-bottom:16px}
-  .card{background:#1a2233;border:1px solid #263149;border-radius:10px;padding:16px}
-  .card h3{font-size:14px;margin-bottom:12px;color:#cdd6ea}
-  table{width:100%;border-collapse:collapse;font-size:12.5px}
-  th,td{padding:7px 6px;text-align:center;border-bottom:1px solid #263149}
-  th{color:#8b96ac;font-weight:400}
+  .grid.even{grid-template-columns:1fr 1fr}
+  .card{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:13px;
+    padding:16px;transition:border-color .25s,background .25s}
+  .grid>.card,.kpis>.kpi{min-width:0}
+  .card:hover{border-color:rgba(167,139,250,.38);background:rgba(255,255,255,.055)}
+  .card h3{font-size:14px;margin-bottom:12px;color:#e2e8f7;font-weight:600;
+    display:flex;align-items:center;gap:9px}
+  .card h3::before{content:"";width:3px;height:14px;border-radius:2px;flex:none;
+    background:linear-gradient(180deg,#22d3ee,#a78bfa);box-shadow:0 0 8px rgba(34,211,238,.6)}
+  .legend{display:flex;gap:16px;font-size:11px;color:rgba(255,255,255,.6);margin-bottom:4px}
+  .legend i{display:inline-block;width:14px;height:3px;border-radius:2px;margin-right:5px;vertical-align:middle}
+  .tablescroll{overflow-x:auto}
+  table{width:100%;min-width:520px;border-collapse:separate;border-spacing:0;font-size:12.5px}
+  th,td{padding:7px 8px;text-align:center;border-bottom:1px solid rgba(255,255,255,.07)}
+  th{color:rgba(255,255,255,.55);font-weight:400}
   td:first-child,th:first-child{text-align:left}
-  .seg{display:flex;flex-direction:column;gap:10px}
+  .seg{display:flex;flex-direction:column;gap:12px;padding-top:2px}
   .segrow{display:flex;align-items:center;gap:10px;font-size:12.5px}
-  .segrow .nm{width:72px}.segbar{flex:1;background:#263149;border-radius:4px;height:16px;overflow:hidden}
-  .segbar i{display:block;height:16px}.segrow b{width:120px;text-align:right;color:#8b96ac;font-weight:400}
-  .risk{font-size:12px;background:#241c26;border-left:3px solid #f5a623;padding:8px 10px;border-radius:4px;margin-bottom:8px}
-  .note{font-size:11px;color:#5c6780;margin-top:8px}
-  @media(max-width:900px){.kpis{grid-template-columns:repeat(2,1fr)}.grid{grid-template-columns:1fr}}
+  .segrow .nm{width:60px;color:rgba(255,255,255,.85)}
+  .segbar{flex:1;background:rgba(255,255,255,.06);border-radius:5px;height:16px;overflow:hidden}
+  .segbar i{display:block;height:16px}
+  .segrow b{width:150px;text-align:right;color:rgba(255,255,255,.6);font-weight:400;font-size:12px}
+  .risk{font-size:12.5px;background:rgba(244,63,94,.07);border:1px solid rgba(244,63,94,.2);
+    border-left:3px solid #ff5c7a;padding:9px 12px;border-radius:6px;margin-bottom:8px;line-height:1.55}
+  .risk b{color:#ffd9e1}
+  .note{font-size:11px;color:rgba(255,255,255,.4);margin-top:10px;line-height:1.7}
+  .note .warn{color:#ff8fa5}
+  @media(max-width:900px){
+    body{padding:14px 14px 24px}
+    .kpis{grid-template-columns:repeat(2,1fr)}
+    .grid,.grid.even{grid-template-columns:1fr}
+    .segrow b{width:auto;flex:none}
+  }
 </style>
 </head>
 <body>
 <div class="wrap">
-  <h1>游戏运营数据分析看板</h1>
-  <div class="sub">休闲放置类手游 · 近90天运营数据（演示数据，指标口径可对齐真实数仓/ThinkingData导出）</div>
+  <header class="topbar">
+    <div>
+      <div class="brandrow"><h1 class="sysname">游戏运营数据分析看板</h1><span class="tag">数据大屏</span></div>
+      <div class="sub">休闲放置类手游 · 近90天运营数据（演示数据，指标口径可对齐真实数仓/ThinkingData导出）</div>
+    </div>
+    <div class="period">数据周期：近 90 天 · 更新 2026-10-07（演示）</div>
+  </header>
 
   <div class="kpis" id="kpis"></div>
 
@@ -44,13 +102,28 @@
   <div class="grid">
     <div class="card">
       <h3>新增用户留存矩阵（Cohort）</h3>
+      <div class="tablescroll">
       <table id="cohort"><thead><tr><th>新增周</th><th>新增数</th><th>D1</th><th>D3</th><th>D7</th><th>D14</th><th>D30</th></tr></thead><tbody></tbody></table>
-      <div class="note">颜色越深留存越高；D7低于25%需排查新手期卡点</div>
+      </div>
+      <div class="note">颜色越亮留存越高；D7低于25%需排查新手期卡点</div>
     </div>
     <div class="card">
       <h3>付费用户分层（近30天）</h3>
       <div class="seg" id="seg"></div>
       <div class="note">鲸鱼（≥2000元）/ 海豚（300-2000）/ 小鱼（&lt;300）/ 非付费</div>
+    </div>
+  </div>
+
+  <div class="grid even">
+    <div class="card">
+      <h3>新手转化漏斗（近30天新增）</h3>
+      <div id="funnel"></div>
+      <div class="note">口径：以下载 100% 为基准，次日回访采用 D1 留存口径（与留存矩阵一致）。<span class="warn">最大流失点：创建角色 → 完成新手引导（级间转化 75.0%），建议排查新手引导第 3 步卡点。</span></div>
+    </div>
+    <div class="card">
+      <h3>新增用户 LTV 曲线（D1–D30）</h3>
+      <div id="ltvChart"></div>
+      <div class="note">付费渗透主要发生在 D3 前（超六成首笔付费发生在安装后 72 小时内），D7 累计 ¥16.0 约占 30 日 LTV 的 28%，长线靠付费用户持续充值拉动。</div>
     </div>
   </div>
 
@@ -88,31 +161,59 @@ const dau30=avg('dau',30);
 // LTV粗算：近30天流水/近30天新增（简化口径，演示）
 const ltv=rev30/data.slice(-30).reduce((a,x)=>a+x.nu,0);
 
-document.getElementById('kpis').innerHTML=[
- ['DAU(近7日均)',Math.round(last7).toLocaleString(),((last7-_prev)/_prev*100)],
- ['日均新增',Math.round(avg('nu',7)).toLocaleString(),null],
- ['付费率',(avg('payRate',7)*100).toFixed(2)+'%',null],
- ['ARPPU','¥'+Math.round(avg('revenue',7)/avg('payers',7)),null],
- ['30天流水','¥'+(rev30/10000).toFixed(1)+'万',null],
- ['新增LTV(30日)','¥'+ltv.toFixed(1),null]
-].map(([l,v,d])=>`<div class="kpi"><div class="lab">${l}</div><div class="val">${v}</div>
+// KPI：进入页面数字从 0 滚动到目标（500ms，不循环）
+const kpiDefs=[
+ ['DAU(近7日均)',Math.round(last7),n=>Math.round(n).toLocaleString(),((last7-_prev)/_prev*100)],
+ ['日均新增',Math.round(avg('nu',7)),n=>Math.round(n).toLocaleString(),null],
+ ['付费率',avg('payRate',7)*100,n=>n.toFixed(2)+'%',null],
+ ['ARPPU',avg('revenue',7)/avg('payers',7),n=>'¥'+Math.round(n),null],
+ ['30天流水',rev30/10000,n=>'¥'+n.toFixed(1)+'万',null],
+ ['新增LTV(30日)',ltv,n=>'¥'+n.toFixed(1),null]
+];
+document.getElementById('kpis').innerHTML=kpiDefs.map(([l,num,fmt,d])=>
+ `<div class="kpi"><div class="val">0</div><div class="lab">${l}</div>
 ${d!==null?`<div class="delta ${d>=0?'up':'down'}">${d>=0?'▲':'▼'} ${Math.abs(d).toFixed(1)}% 环比</div>`:''}</div>`).join('');
+(function(){
+  const els=document.querySelectorAll('#kpis .val');
+  const t0=performance.now(),DUR=500;
+  requestAnimationFrame(function tick(now){
+    const t=Math.min(1,(now-t0)/DUR),e=1-Math.pow(1-t,3);
+    kpiDefs.forEach((d,i)=>{els[i].textContent=d[2](d[1]*e)});
+    if(t<1)requestAnimationFrame(tick);
+    else kpiDefs.forEach((d,i)=>{els[i].textContent=d[2](d[1])});
+  });
+})();
 
-function lineChart(el,series,w,h,colors){
-  const W=w,H=h,L=44,B=24,T=10,R=10;
+function lineChart(el,series,w,h,legend){
+  const W=w,H=h,L=46,B=26,T=12,R=14;
   const all=series.flatMap(s=>s.data),max=Math.max(...all)*1.05;
   const X=i=>L+i*(W-L-R)/(series[0].data.length-1),Y=v=>T+(H-T-B)*(1-v/max);
+  const fid='glow'+Math.random().toString(36).slice(2,8);
+  let defs=`<filter id="${fid}" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation="2.4" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>`;
   let svg='';
-  [0,.25,.5,.75,1].forEach(g=>{const y=Y(max*g);svg+=`<line x1="${L}" y1="${y}" x2="${W-R}" y2="${y}" stroke="#263149"/><text x="4" y="${y+4}" font-size="9" fill="#5c6780">${Math.round(max*g/1000)}k</text>`});
-  [0,.33,.66,1].forEach(g=>{const i=Math.round(g*(series[0].data.length-1));svg+=`<text x="${X(i)}" y="${H-6}" font-size="9" fill="#5c6780" text-anchor="middle">${data[i].date.slice(5)}</text>`});
-  series.forEach(s=>{
+  [0,.25,.5,.75,1].forEach(g=>{const y=Y(max*g);svg+=`<line x1="${L}" y1="${y}" x2="${W-R}" y2="${y}" stroke="rgba(255,255,255,0.06)"/><text x="4" y="${y+4}" font-size="9" fill="rgba(255,255,255,0.55)">${Math.round(max*g/1000)}k</text>`});
+  [0,.33,.66,1].forEach(g=>{const i=Math.round(g*(series[0].data.length-1));svg+=`<text x="${X(i)}" y="${H-6}" font-size="9" fill="rgba(255,255,255,0.55)" text-anchor="middle">${data[i].date.slice(5)}</text>`});
+  series.forEach((s,si)=>{
+    if(s.area){
+      const gid=fid+'a'+si;
+      defs+=`<linearGradient id="${gid}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${s.color}" stop-opacity=".2"/><stop offset="1" stop-color="${s.color}" stop-opacity="0"/></linearGradient>`;
+      const base=Y(0).toFixed(1);
+      const ap=s.data.map((v,i)=>(i?'L':'M')+X(i).toFixed(1)+' '+Y(v).toFixed(1)).join(' ')+` L ${X(s.data.length-1).toFixed(1)} ${base} L ${X(0).toFixed(1)} ${base} Z`;
+      svg+=`<path d="${ap}" fill="url(#${gid})"/>`;
+    }
     const p=s.data.map((v,i)=>(i?'L':'M')+X(i).toFixed(1)+' '+Y(v).toFixed(1)).join(' ');
-    svg+=`<path d="${p}" fill="none" stroke="${s.color}" stroke-width="1.8"/>`;
+    svg+=`<path d="${p}" fill="none" stroke="${s.color}" stroke-width="1.8" filter="url(#${fid})" stroke-linejoin="round" stroke-linecap="round"/>`;
   });
-  el.innerHTML=`<svg viewBox="0 0 ${W} ${H}" width="100%">${svg}</svg>`;
+  const lg=legend?`<div class="legend">${legend.map(x=>`<span><i style="background:${x.c}"></i>${x.t}</span>`).join('')}</div>`:'';
+  el.innerHTML=lg+`<svg viewBox="0 0 ${W} ${H}" width="100%"><defs>${defs}</defs>${svg}</svg>`;
 }
-lineChart(dauChart,[{data:data.map(x=>x.dau),color:'#5aa7ff'},{data:data.map(x=>x.nu),color:'#37d399'}],680,240);
-lineChart(revChart,[{data:data.map(x=>x.revenue),color:'#ff5c7a'}],680,240);
+lineChart(document.getElementById('dauChart'),[
+ {data:data.map(x=>x.dau),color:'#22d3ee',area:true},
+ {data:data.map(x=>x.nu),color:'#a78bfa'}
+],680,240,[{c:'#22d3ee',t:'DAU'},{c:'#a78bfa',t:'新增用户'}]);
+lineChart(document.getElementById('revChart'),[
+ {data:data.map(x=>x.revenue),color:'#ff5c7a',area:true}
+],470,240,[{c:'#ff5c7a',t:'每日流水（元）'}]);
 
 // 留存矩阵（演示，按周递减+轻微改善）
 const cohorts=[];
@@ -122,24 +223,74 @@ for(let w=8;w>=1;w--){
   const r=d=>Math.max(8,base-d*4.6-rnd()*3);
   cohorts.push({label:`W-${w}`,n,r1:r(1),r3:r(3),r7:r(7),r14:r(14),r30:r(30)});
 }
-const cell=v=>{const c=v>35?'#2f6df6':v>25?'#3b4f86':v>15?'#2c3a58':'#232c40';
-  return `<td style="background:${c};border-radius:3px">${v.toFixed(1)}%</td>`};
+const cell=v=>{const t=Math.min(1,Math.max(0,v/48));
+  const a=(0.07+t*0.83).toFixed(2),c=t>0.55?'#052733':'#d9f6ff';
+  return `<td style="background:rgba(34,211,238,${a});color:${c};border-radius:4px">${v.toFixed(1)}%</td>`};
 document.querySelector('#cohort tbody').innerHTML=cohorts.map(c=>
  `<tr><td>${c.label}</td><td>${c.n.toLocaleString()}</td>${cell(c.r1)}${cell(c.r3)}${cell(c.r7)}${cell(c.r14)}${cell(c.r30)}</tr>`).join('');
 
 // 付费分层
 const totalUsers=dau30;
 const seg=[
- ['鲸鱼',0.8,'#ff5c7a',rev30*0.42],
- ['海豚',6.5,'#f5a623',rev30*0.38],
- ['小鱼',13.7,'#5aa7ff',rev30*0.20],
- ['非付费',79.0,'#3a4663',0]
+ ['鲸鱼',0.8,'#f471b5',rev30*0.42],
+ ['海豚',6.5,'#a78bfa',rev30*0.38],
+ ['小鱼',13.7,'#22d3ee',rev30*0.20],
+ ['非付费',79.0,'rgba(255,255,255,0.16)',0]
 ];
 const maxPct=Math.max(...seg.map(s=>s[1]));
 document.getElementById('seg').innerHTML=seg.map(([n,p,color,rev])=>
  `<div class="segrow"><span class="nm">${n}</span>
  <div class="segbar"><i style="width:${p/maxPct*100}%;background:${color}"></i></div>
  <b>${p}% · 流水¥${(rev/10000).toFixed(1)}万</b></div>`).join('');
+
+// 新手转化漏斗（下载→注册→创建角色→完成新手引导→次日回访D1）
+(function(){
+  const stages=[['下载',100],['注册',85],['创建角色',72],['完成新手引导',54],['次日回访',41]];
+  const W=680,H=296,cx=270,top=14,rh=50,hwMax=182,steep=2;
+  const cols=['#22d3ee','#38bdf8','#818cf8','#a78bfa','#c084fc'];
+  const hw=r=>hwMax*r/100;
+  let svg='';
+  stages.forEach((s,i)=>{
+    const y1=top+i*rh,y2=top+(i+1)*rh,wT=hw(s[1]);
+    const wB=i<stages.length-1?hw(stages[i+1][1]):wT*0.62;
+    svg+=`<path d="M ${cx-wT} ${y1} L ${cx+wT} ${y1} L ${cx+wB} ${y2} L ${cx-wB} ${y2} Z" fill="${cols[i]}" fill-opacity="${(0.88-i*0.05).toFixed(2)}" stroke="rgba(255,255,255,0.18)"/>`;
+    svg+=`<text x="${cx}" y="${(y1+y2)/2+4}" text-anchor="middle" font-size="12.5" font-weight="600" fill="#f2fbff">${s[0]} ${s[1]}%</text>`;
+  });
+  for(let i=0;i<stages.length-1;i++){
+    const y=top+(i+1)*rh,rate=stages[i+1][1]/stages[i][1]*100,st=i===steep;
+    svg+=`<text x="${cx-hw(stages[i][1])-8}" y="${y+4}" text-anchor="end" font-size="10.5" font-weight="${st?700:400}" fill="${st?'#ff5c7a':'rgba(255,255,255,0.55)'}">↓ ${rate.toFixed(1)}%</text>`;
+  }
+  const ay=top+(steep+1)*rh;
+  svg+=`<text x="472" y="${ay-6}" font-size="12" font-weight="700" fill="#ff5c7a">最大流失点</text>`;
+  svg+=`<text x="472" y="${ay+12}" font-size="10.5" fill="#ffb9c6">建议排查新手引导第 3 步</text>`;
+  document.getElementById('funnel').innerHTML=`<svg viewBox="0 0 ${W} ${H}" width="100%">${svg}</svg>`;
+})();
+
+// 新增用户 LTV 曲线（D1–D30，终点与 KPI「新增LTV ¥57.3」一致）
+(function(){
+  const ltvData=[2.1,4.2,7.2,9.6,11.8,14.0,16.0,17.8,19.6,21.3,22.9,24.5,26.2,27.8,29.5,31.2,32.9,34.6,36.4,38.2,40.1,42.0,43.9,45.9,47.9,50.0,52.1,54.2,56.0,57.3];
+  const W=620,H=260,L=46,B=28,T=14,R=16,max=60,n=ltvData.length;
+  const X=i=>L+i*(W-L-R)/(n-1),Y=v=>T+(H-T-B)*(1-v/max);
+  const fid='ltv'+Math.random().toString(36).slice(2,7);
+  const defs=`<filter id="${fid}" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation="2.6" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+  <linearGradient id="${fid}f" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#22d3ee" stop-opacity=".25"/><stop offset="1" stop-color="#22d3ee" stop-opacity="0"/></linearGradient>
+  <linearGradient id="${fid}l" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#22d3ee"/><stop offset="1" stop-color="#a78bfa"/></linearGradient>`;
+  let svg='';
+  [0,15,30,45,60].forEach(g=>{const y=Y(g);svg+=`<line x1="${L}" y1="${y}" x2="${W-R}" y2="${y}" stroke="rgba(255,255,255,0.06)"/><text x="4" y="${y+4}" font-size="9.5" fill="rgba(255,255,255,0.55)">¥${g}</text>`});
+  [1,5,10,15,20,25,30].forEach(d=>{svg+=`<text x="${X(d-1)}" y="${H-8}" font-size="9.5" fill="rgba(255,255,255,0.55)" text-anchor="middle">D${d}</text>`});
+  const pts=ltvData.map((v,i)=>[X(i),Y(v)]);
+  let p=`M ${pts[0][0].toFixed(1)} ${pts[0][1].toFixed(1)}`;
+  for(let i=1;i<n-1;i++){const mx=(pts[i][0]+pts[i+1][0])/2,my=(pts[i][1]+pts[i+1][1])/2;p+=` Q ${pts[i][0].toFixed(1)} ${pts[i][1].toFixed(1)} ${mx.toFixed(1)} ${my.toFixed(1)}`;}
+  p+=` L ${pts[n-1][0].toFixed(1)} ${pts[n-1][1].toFixed(1)}`;
+  svg+=`<path d="${p} L ${pts[n-1][0].toFixed(1)} ${Y(0).toFixed(1)} L ${pts[0][0].toFixed(1)} ${Y(0).toFixed(1)} Z" fill="url(#${fid}f)"/>`;
+  svg+=`<path d="${p}" fill="none" stroke="url(#${fid}l)" stroke-width="2.2" filter="url(#${fid})" stroke-linecap="round"/>`;
+  [[7,'D7 ¥16.0','middle',-12],[30,'D30 ¥57.3','end',-12]].forEach(([d,t,anch,dy])=>{
+    const x=X(d-1),y=Y(ltvData[d-1]);
+    svg+=`<circle cx="${x}" cy="${y}" r="3.6" fill="#0a0e1f" stroke="#22d3ee" stroke-width="2"/>`;
+    svg+=`<text x="${x}" y="${y+dy}" font-size="11" font-weight="700" fill="#e9fbff" text-anchor="${anch}">${t}</text>`;
+  });
+  document.getElementById('ltvChart').innerHTML=`<svg viewBox="0 0 ${W} ${H}" width="100%"><defs>${defs}</defs>${svg}</svg>`;
+})();
 
 // 流失风险名单（演示）
 const risks=[
