@@ -3,82 +3,139 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>游戏运营数据分析看板</title>
+<title>游戏运营驾驶舱 · 放置类手游运营数据分析平台</title>
 <style>
   *{margin:0;padding:0;box-sizing:border-box}
   svg{font-family:inherit;display:block}
-  body{font-family:"Microsoft YaHei","PingFang SC",sans-serif;color:#e6eaf6;min-height:100vh;
-    padding:20px 20px 36px;background:#0a0e1f;
+  body{font-family:"Microsoft YaHei","PingFang SC","Segoe UI",sans-serif;color:#e6eaf6;min-height:100vh;
+    padding:18px 18px 40px;background:#070b1a;
     background-image:
-      radial-gradient(1100px 620px at 88% -12%,rgba(167,139,250,.16),transparent 62%),
-      radial-gradient(900px 560px at -8% 18%,rgba(34,211,238,.12),transparent 60%),
-      linear-gradient(160deg,#0a0e1f 0%,#0d1026 52%,#141026 100%);
+      radial-gradient(1200px 680px at 90% -10%,rgba(167,139,250,.18),transparent 60%),
+      radial-gradient(1000px 600px at -10% 10%,rgba(34,211,238,.13),transparent 58%),
+      linear-gradient(160deg,#070b1a 0%,#0c1028 55%,#100e26 100%);
     background-attachment:fixed}
   body::before{content:"";position:fixed;inset:0;pointer-events:none;z-index:0;
-    background-image:radial-gradient(rgba(255,255,255,.05) 1px,transparent 1.4px);
-    background-size:26px 26px}
-  .wrap{max-width:1200px;margin:auto;position:relative;z-index:1}
-  .topbar{display:flex;justify-content:space-between;align-items:flex-end;gap:12px;flex-wrap:wrap;
-    padding:16px 20px;margin-bottom:16px;border:1px solid rgba(255,255,255,.08);border-radius:14px;
-    background:rgba(255,255,255,.04);position:relative;overflow:hidden}
+    background-image:radial-gradient(rgba(255,255,255,.045) 1px,transparent 1.4px);
+    background-size:28px 28px}
+  .wrap{max-width:1280px;margin:auto;position:relative;z-index:1}
+
+  /* ============ 顶部 ============ */
+  .topbar{display:flex;justify-content:space-between;align-items:flex-end;gap:14px;flex-wrap:wrap;
+    padding:18px 22px;margin-bottom:16px;border:1px solid rgba(255,255,255,.08);border-radius:16px;
+    background:rgba(255,255,255,.035);position:relative;overflow:hidden}
   .topbar::before{content:"";position:absolute;left:0;top:0;right:0;height:2px;
     background:linear-gradient(90deg,#22d3ee,#a78bfa 55%,transparent)}
-  .brandrow{display:flex;align-items:center;flex-wrap:wrap;gap:10px}
-  h1.sysname{font-size:21px;font-weight:700;letter-spacing:2px;
-    background:linear-gradient(90deg,#eaf7ff 20%,#a78bfa 90%);
+  .brandrow{display:flex;align-items:center;flex-wrap:wrap;gap:12px}
+  h1.sysname{font-size:22px;font-weight:700;letter-spacing:2px;
+    background:linear-gradient(90deg,#eaf7ff 18%,#a78bfa 92%);
     -webkit-background-clip:text;background-clip:text;color:transparent;-webkit-text-fill-color:transparent}
-  .tag{font-size:11px;color:#7ee9fb;border:1px solid rgba(34,211,238,.4);border-radius:4px;
-    padding:2px 9px;letter-spacing:3px;background:rgba(34,211,238,.08)}
-  .sub{color:rgba(255,255,255,.5);font-size:12px;margin-top:5px}
-  .period{font-size:12px;color:rgba(255,255,255,.65);padding:5px 13px;border:1px solid rgba(255,255,255,.1);
-    border-radius:999px;background:rgba(34,211,238,.07);white-space:nowrap}
-  .kpis{display:grid;grid-template-columns:repeat(6,1fr);gap:12px;margin-bottom:16px}
-  .kpi{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:13px;
-    padding:14px 14px 12px;position:relative;overflow:hidden;
-    transition:background .25s,border-color .25s}
-  .kpi::after{content:"";position:absolute;left:14px;right:14px;bottom:0;height:2px;border-radius:2px;
-    background:linear-gradient(90deg,rgba(34,211,238,.7),transparent)}
-  .kpi:hover{background:rgba(255,255,255,.075);border-color:rgba(34,211,238,.45)}
-  .kpi .val{font-size:24px;font-weight:700;letter-spacing:.5px;white-space:nowrap;
+  .tag{font-size:10.5px;color:#7ee9fb;border:1px solid rgba(34,211,238,.42);border-radius:4px;
+    padding:3px 11px;letter-spacing:3px;background:rgba(34,211,238,.08)}
+  .sub{color:rgba(255,255,255,.5);font-size:12.5px;margin-top:7px;line-height:1.6}
+  .topright{display:flex;flex-direction:column;align-items:flex-end;gap:10px}
+  .period{font-size:12px;color:rgba(255,255,255,.7);padding:6px 14px;border:1px solid rgba(255,255,255,.1);
+    border-radius:999px;background:rgba(34,211,238,.06);white-space:nowrap}
+  .range{display:flex;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);
+    border-radius:8px;overflow:hidden}
+  .range button{background:transparent;border:0;color:rgba(255,255,255,.55);font-size:12px;
+    padding:7px 14px;cursor:pointer;font-family:inherit;transition:all .2s}
+  .range button:hover{background:rgba(255,255,255,.06)}
+  .range button.active{background:linear-gradient(90deg,rgba(34,211,238,.25),rgba(167,139,250,.25));
+    color:#fff;font-weight:600}
+
+  /* ============ KPI ============ */
+  .kpi-group{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:14px}
+  .kpi-card{background:rgba(255,255,255,.035);border:1px solid rgba(255,255,255,.075);border-radius:13px;
+    padding:14px 16px;position:relative;overflow:hidden;transition:background .2s,border-color .2s}
+  .kpi-card:hover{background:rgba(255,255,255,.06);border-color:rgba(34,211,238,.3)}
+  .kpi-card .gname{font-size:11px;color:rgba(255,255,255,.42);letter-spacing:3px;margin-bottom:10px;
+    display:flex;align-items:center;gap:6px}
+  .kpi-card .gname::before{content:"";width:10px;height:10px;border-radius:2px;background:linear-gradient(135deg,#22d3ee,#a78bfa)}
+  .kpi-row{display:grid;grid-template-columns:repeat(2,1fr);gap:10px 16px}
+  .kpi-item .val{font-size:23px;font-weight:700;letter-spacing:.5px;white-space:nowrap;
     font-family:"Bahnschrift","DIN Alternate","Segoe UI","Microsoft YaHei",sans-serif;
-    background:linear-gradient(92deg,#7ee9fb 10%,#a78bfa 90%);
-    -webkit-background-clip:text;background-clip:text;color:transparent;-webkit-text-fill-color:transparent}
-  .kpi .lab{font-size:12px;color:rgba(255,255,255,.55);margin-top:6px}
-  .kpi .delta{font-size:11px;margin-top:3px}
-  .up{color:#ff5c7a}.down{color:#37d399}
-  .grid{display:grid;grid-template-columns:1.4fr 1fr;gap:12px;margin-bottom:16px}
+    background:linear-gradient(92deg,#7ee9fb 8%,#a78bfa 92%);
+    -webkit-background-clip:text;background-clip:text;color:transparent;-webkit-text-fill-color:transparent;line-height:1.1}
+  .kpi-item .lab{font-size:11.5px;color:rgba(255,255,255,.5);margin-top:3px}
+  .kpi-item .delta{font-size:10.5px;margin-top:3px}
+  .up{color:#34d399}.down{color:#ff6b8a}
+
+  /* ============ 卡片通用 ============ */
+  .grid{display:grid;grid-template-columns:1.45fr 1fr;gap:14px;margin-bottom:14px}
   .grid.even{grid-template-columns:1fr 1fr}
-  .card{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:13px;
-    padding:16px;transition:border-color .25s,background .25s}
-  .grid>.card,.kpis>.kpi{min-width:0}
-  .card:hover{border-color:rgba(167,139,250,.38);background:rgba(255,255,255,.055)}
-  .card h3{font-size:14px;margin-bottom:12px;color:#e2e8f7;font-weight:600;
-    display:flex;align-items:center;gap:9px}
+  .grid.wide{grid-template-columns:1fr}
+  .card{background:rgba(255,255,255,.035);border:1px solid rgba(255,255,255,.075);border-radius:13px;
+    padding:16px 18px;transition:border-color .2s,background .2s}
+  .card:hover{border-color:rgba(167,139,250,.35);background:rgba(255,255,255,.05)}
+  .card h3{font-size:14px;margin-bottom:13px;color:#e2e8f7;font-weight:600;
+    display:flex;align-items:center;gap:9px;flex-wrap:wrap}
   .card h3::before{content:"";width:3px;height:14px;border-radius:2px;flex:none;
     background:linear-gradient(180deg,#22d3ee,#a78bfa);box-shadow:0 0 8px rgba(34,211,238,.6)}
-  .legend{display:flex;gap:16px;font-size:11px;color:rgba(255,255,255,.6);margin-bottom:4px}
+  .card h3 .hint{font-size:11px;color:rgba(255,255,255,.42);font-weight:400;margin-left:4px}
+  .legend{display:flex;gap:16px;font-size:11px;color:rgba(255,255,255,.55);margin-bottom:4px;flex-wrap:wrap}
   .legend i{display:inline-block;width:14px;height:3px;border-radius:2px;margin-right:5px;vertical-align:middle}
+  .legend .dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:5px;vertical-align:middle}
+
+  /* ============ 表格 ============ */
   .tablescroll{overflow-x:auto}
-  table{width:100%;min-width:520px;border-collapse:separate;border-spacing:0;font-size:12.5px}
+  table{width:100%;min-width:480px;border-collapse:separate;border-spacing:0;font-size:12.5px}
   th,td{padding:7px 8px;text-align:center;border-bottom:1px solid rgba(255,255,255,.07)}
-  th{color:rgba(255,255,255,.55);font-weight:400}
+  th{color:rgba(255,255,255,.5);font-weight:400;background:rgba(255,255,255,.02)}
   td:first-child,th:first-child{text-align:left}
-  .seg{display:flex;flex-direction:column;gap:12px;padding-top:2px}
+  .num{font-variant-numeric:tabular-nums}
+
+  /* ============ 付费分层/档位条 ============ */
+  .seg{display:flex;flex-direction:column;gap:11px;padding-top:2px}
   .segrow{display:flex;align-items:center;gap:10px;font-size:12.5px}
-  .segrow .nm{width:60px;color:rgba(255,255,255,.85)}
+  .segrow .nm{width:64px;color:rgba(255,255,255,.85);flex:none}
   .segbar{flex:1;background:rgba(255,255,255,.06);border-radius:5px;height:16px;overflow:hidden}
-  .segbar i{display:block;height:16px}
-  .segrow b{width:150px;text-align:right;color:rgba(255,255,255,.6);font-weight:400;font-size:12px}
-  .risk{font-size:12.5px;background:rgba(244,63,94,.07);border:1px solid rgba(244,63,94,.2);
-    border-left:3px solid #ff5c7a;padding:9px 12px;border-radius:6px;margin-bottom:8px;line-height:1.55}
+  .segbar i{display:block;height:16px;border-radius:5px;transition:width .6s}
+  .segrow b{width:148px;text-align:right;color:rgba(255,255,255,.58);font-weight:400;font-size:11.5px;flex:none}
+
+  /* ============ 风险预警 ============ */
+  .risk{font-size:12px;background:rgba(244,63,94,.06);border:1px solid rgba(244,63,94,.18);
+    border-left:3px solid #ff5c7a;padding:10px 13px;border-radius:6px;margin-bottom:9px;line-height:1.6}
   .risk b{color:#ffd9e1}
-  .note{font-size:11px;color:rgba(255,255,255,.4);margin-top:10px;line-height:1.7}
+  .risk .lvl{display:inline-block;font-size:10px;padding:1px 8px;border-radius:10px;margin-left:6px;font-weight:600}
+  .lvl-high{background:rgba(244,63,94,.25);color:#ff8fa5}
+  .lvl-mid{background:rgba(251,191,36,.2);color:#fbbf24}
+  .risk .act{color:#f5a623;font-weight:600}
+
+  /* ============ 动作中心 ============ */
+  .actions{display:grid;grid-template-columns:repeat(2,1fr);gap:11px}
+  .acard{border-radius:10px;padding:13px 14px;border:1px solid;font-size:12px;line-height:1.65;position:relative;overflow:hidden}
+  .acard b{display:block;font-size:12.5px;margin-bottom:5px;display:flex;align-items:center;gap:6px}
+  .acard b .badge{font-size:10px;padding:1px 7px;border-radius:9px;font-weight:600}
+  .a-red{border-color:rgba(248,113,113,.32);background:rgba(248,113,113,.06)}
+  .a-red b{color:#f87171}
+  .a-red .badge{background:rgba(248,113,113,.25);color:#ff9eb0}
+  .a-green{border-color:rgba(52,211,153,.32);background:rgba(52,211,153,.06)}
+  .a-green b{color:#34d399}
+  .a-green .badge{background:rgba(52,211,153,.22);color:#6ee7b7}
+  .a-amber{border-color:rgba(251,191,36,.32);background:rgba(251,191,36,.06)}
+  .a-amber b{color:#fbbf24}
+  .a-amber .badge{background:rgba(251,191,36,.22);color:#fcd34d}
+  .a-blue{border-color:rgba(56,189,248,.32);background:rgba(56,189,248,.06)}
+  .a-blue b{color:#38bdf8}
+  .a-blue .badge{background:rgba(56,189,248,.22);color:#7dd3fc}
+  .acard .roi{position:absolute;right:12px;top:10px;font-size:11px;color:rgba(255,255,255,.4)}
+
+  /* ============ 通用 ============ */
+  .note{font-size:11px;color:rgba(255,255,255,.38);margin-top:10px;line-height:1.7}
   .note .warn{color:#ff8fa5}
-  @media(max-width:900px){
-    body{padding:14px 14px 24px}
-    .kpis{grid-template-columns:repeat(2,1fr)}
+  .note .ok{color:#34d399}
+  footer{max-width:1280px;margin:8px auto 0;padding:0 6px;font-size:10.5px;color:rgba(255,255,255,.3);line-height:1.7}
+  @media(max-width:960px){
+    .kpi-group{grid-template-columns:1fr}
+    .kpi-row{grid-template-columns:repeat(2,1fr)}
     .grid,.grid.even{grid-template-columns:1fr}
+    .actions{grid-template-columns:1fr}
     .segrow b{width:auto;flex:none}
+  }
+  @media(max-width:560px){
+    .kpi-row{grid-template-columns:1fr 1fr;gap:8px}
+    .kpi-item .val{font-size:19px}
+    body{padding:12px}
   }
 </style>
 </head>
@@ -86,117 +143,259 @@
 <div class="wrap">
   <header class="topbar">
     <div>
-      <div class="brandrow"><h1 class="sysname">游戏运营数据分析看板</h1><span class="tag">数据大屏</span></div>
-      <div class="sub">休闲放置类手游 · 近90天运营数据（演示数据，指标口径可对齐真实数仓/ThinkingData导出）</div>
+      <div class="brandrow"><h1 class="sysname">游戏运营驾驶舱</h1><span class="tag">OPERATIONS COCKPIT</span></div>
+      <div class="sub">休闲放置类手游 · 全链路运营数据中枢 ｜ 规模 → 收入 → 留存 → 付费 → 流失 · 一屏掌控</div>
     </div>
-    <div class="period">数据周期：近 90 天 · 更新 2026-10-07（演示）</div>
+    <div class="topright">
+      <div class="range" id="range">
+        <button data-r="7">近7日</button>
+        <button data-r="30" class="active">近30日</button>
+        <button data-r="90">近90日</button>
+      </div>
+      <div class="period">数据周期：近 <span id="periodDays">30</span> 天 · 截止 2026-09-30（演示数据）</div>
+    </div>
   </header>
 
-  <div class="kpis" id="kpis"></div>
-
-  <div class="grid">
-    <div class="card"><h3>DAU / 新增用户趋势</h3><div id="dauChart"></div></div>
-    <div class="card"><h3>每日流水与付费率</h3><div id="revChart"></div></div>
-  </div>
-
-  <div class="grid">
-    <div class="card">
-      <h3>新增用户留存矩阵（Cohort）</h3>
-      <div class="tablescroll">
-      <table id="cohort"><thead><tr><th>新增周</th><th>新增数</th><th>D1</th><th>D3</th><th>D7</th><th>D14</th><th>D30</th></tr></thead><tbody></tbody></table>
-      </div>
-      <div class="note">颜色越亮留存越高；D7低于25%需排查新手期卡点</div>
+  <!-- ============ KPI 三组 ============ -->
+  <div class="kpi-group">
+    <div class="kpi-card">
+      <div class="gname">用户规模</div>
+      <div class="kpi-row" id="kpi-scale"></div>
     </div>
-    <div class="card">
-      <h3>付费用户分层（近30天）</h3>
-      <div class="seg" id="seg"></div>
-      <div class="note">鲸鱼（≥2000元）/ 海豚（300-2000）/ 小鱼（&lt;300）/ 非付费</div>
+    <div class="kpi-card">
+      <div class="gname">收入变现</div>
+      <div class="kpi-row" id="kpi-revenue"></div>
+    </div>
+    <div class="kpi-card">
+      <div class="gname">留存质量</div>
+      <div class="kpi-row" id="kpi-quality"></div>
     </div>
   </div>
 
-  <div class="grid even">
+  <!-- ============ 营收构成 & 用户构成 ============ -->
+  <div class="grid">
+    <div class="card"><h3>营收与付费率趋势 <span class="hint">柱：日流水（万元）｜线：付费率（%）｜▲ 运营活动</span></h3>
+      <div id="revChart"></div></div>
+    <div class="card"><h3>用户规模构成 <span class="hint">DAU / 日均新增 / 人均时长</span></h3>
+      <div id="dauChart"></div></div>
+  </div>
+
+  <!-- ============ 留存分析 ============ -->
+  <div class="grid">
     <div class="card">
-      <h3>新手转化漏斗（近30天新增）</h3>
+      <h3>新增用户留存矩阵（Cohort · 按新增周）<span class="hint">D1 / D3 / D7 / D14 / D30</span></h3>
+      <div class="tablescroll"><table id="cohort"><thead><tr><th>新增周</th><th>新增数</th><th>D1</th><th>D3</th><th>D7</th><th>D14</th><th>D30</th></tr></thead><tbody></tbody></table></div>
+      <div class="note">颜色越亮留存越高；<span class="warn">D7 低于 20% 视为新手期异常</span>，需排查前 10 分钟体验卡点。</div>
+    </div>
+    <div class="card">
+      <h3>留存曲线对比 <span class="hint">最近 4 个新增周的 D1–D30 衰减</span></h3>
+      <div id="retChart"></div>
+      <div class="note">曲线越靠右上留存越健康；对比 W-1 与 W-4 可见新手期优化带来的 D1 提升。</div>
+    </div>
+  </div>
+
+  <!-- ============ 付费分析 ============ -->
+  <div class="grid">
+    <div class="card">
+      <h3>付费转化漏斗 <span class="hint">近30日新增用户口径</span></h3>
       <div id="funnel"></div>
-      <div class="note">口径：以下载 100% 为基准，次日回访采用 D1 留存口径（与留存矩阵一致）。<span class="warn">最大流失点：创建角色 → 完成新手引导（级间转化 75.0%），建议排查新手引导第 3 步卡点。</span></div>
+      <div class="note">以下载为 100% 基准；<span class="warn">最大流失点：完成新手引导 → 首日付费（级间转化 38.2%）</span>，建议在引导结束后投放首充礼包。</div>
     </div>
     <div class="card">
-      <h3>新增用户 LTV 曲线（D1–D30）</h3>
-      <div id="ltvChart"></div>
-      <div class="note">付费渗透主要发生在 D3 前（超六成首笔付费发生在安装后 72 小时内），D7 累计 ¥16.0 约占 30 日 LTV 的 28%，长线靠付费用户持续充值拉动。</div>
+      <h3>付费档位分布 <span class="hint">近30日各档位充值笔数占比</span></h3>
+      <div class="seg" id="tier"></div>
+      <div class="legend"><span><i style="background:#f471b5"></i>648 元</span><span><i style="background:#a78bfa"></i>328 元</span><span><i style="background:#22d3ee"></i>128 元</span><span><i style="background:#38bdf8"></i>68 元</span><span><i style="background:#64748b"></i>30 元及以下</span></div>
     </div>
   </div>
 
-  <div class="card" style="margin-bottom:16px">
-    <h3>高流失风险用户预警（自动圈选：鲸鱼海豚 + 近7日未登录）</h3>
+  <!-- ============ LTV & 付费分层 ============ -->
+  <div class="grid">
+    <div class="card">
+      <h3>新增用户 LTV 曲线与回本线 <span class="hint">D1–D30 累计 LTV（元）</span></h3>
+      <div id="ltvChart"></div>
+      <div class="note">D7 累计 ¥16.0 约占 D30 LTV 的 27.9%；<span class="ok">付费渗透主要集中在 D3 前（超 60% 首笔付费发生在 72 小时内）</span>，买量回收周期可按 D7 LTV 估算。</div>
+    </div>
+    <div class="card">
+      <h3>付费用户分层 <span class="hint">近30日 · 鲸鱼/海豚/小鱼/非付费</span></h3>
+      <div class="seg" id="seg"></div>
+      <div class="note">鲸鱼贡献 42% 流水，海豚贡献 38%——运营资源应优先覆盖前两层（1v1 服务 + 专属活动）。</div>
+    </div>
+  </div>
+
+  <!-- ============ 活动 ROI 复盘 ============ -->
+  <div class="card" style="margin-bottom:14px">
+    <h3>运营活动 ROI 复盘 <span class="hint">增量营收口径：活动期流水 − 同期基线</span></h3>
+    <div class="tablescroll"><table id="promo"><thead><tr><th>活动名称</th><th>周期</th><th>投入(万)</th><th>增量流水(万)</th><th>ROI</th><th>新增DAU贡献</th><th>建议</th></tr></thead><tbody></tbody></table></div>
+  </div>
+
+  <!-- ============ RFM 流失预警 ============ -->
+  <div class="card" style="margin-bottom:14px">
+    <h3>高流失风险用户预警 <span class="hint">RFM 自动圈选：鲸鱼/海豚 + 近 7 日未登录，按挽回 ROI 排序</span></h3>
     <div id="risks"></div>
+  </div>
+
+  <!-- ============ 运营动作中心 ============ -->
+  <div class="card">
+    <h3>运营动作中心 <span class="hint">规则引擎自动生成 · 按优先级排序</span></h3>
+    <div class="actions" id="actions"></div>
   </div>
 </div>
 
+<footer>
+  数据说明：本看板为 <b>脱敏演示数据</b>（确定性伪随机生成，所有指标交叉自洽：流水 = DAU × 付费率 × ARPPU）。
+  真实接入时按 <code>{date, dau, new_users, pay_rate, arppu, revenue, play_minutes}</code> 结构替换数据源即可，规则引擎与展示逻辑无需改动。
+  指标口径可对齐 ThinkingData / 自建数仓导出。
+</footer>
+
 <script>
+/* ============================================================
+   确定性伪随机 + 数据模型（所有数字交叉自洽）
+   ============================================================ */
 function rng(seed){return function(){seed|=0;seed=seed+0x6D2B79F5|0;let t=Math.imul(seed^seed>>>15,1|seed);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
-const rnd=rng(9981);
-const DAYS=90, today=new Date('2026-09-30');
-// 基础盘：DAU缓降后靠活动拉升；周末上浮
+const rnd=rng(20260930);
+
+const DAYS=90, today=new Date('2026-09-30T00:00:00');
+const EVENTS=[
+  {day:DAYS-1,name:'新版本 v2.3 上线'},
+  {day:DAYS-12,name:'中秋限时活动'},
+  {day:DAYS-45,name:'暑期资料片'},
+  {day:DAYS-70,name:'618 充值返利'},
+];
+
 const data=[];
-let dau=8200;
+let dau=9200;
 for(let i=DAYS-1;i>=0;i--){
   const d=new Date(today);d.setDate(d.getDate()-i);
   const wk=[0,6].includes(d.getDay());
-  const trend=-0.9+Math.sin(i/11)*18+(i<20?i*2.2:0); // 近期活动拉升
-  dau=Math.round(Math.max(6000,dau+trend+(wk?350:0)+(rnd()-0.5)*260));
-  const nu=Math.round(500+rnd()*420+(wk?120:0)+(i<20?i*6:0));
-  const payRate=(2.9+rnd()*1.1+(i<20?0.5:0))/100;
+  const trend=-0.7+Math.sin(i/13)*16+(i<25?i*1.8:0);
+  dau=Math.round(Math.max(5800,dau+trend+(wk?380:0)+(rnd()-0.5)*240));
+  const nu=Math.round(620+rnd()*380+(wk?110:0)+(i<25?i*5:0));
+  const payRate=(3.4+rnd()*1.2+(i<25?0.55:0))/100;
   const payers=Math.round(dau*payRate);
-  const arppu=52+rnd()*26+(i%14<2?40:0); // 双周活动日ARPPU抬升
+  const arppu=58+rnd()*24+(i%14<2?42:0);
   const revenue=Math.round(payers*arppu);
-  data.push({date:d.toISOString().slice(0,5)+d.toISOString().slice(5,10),dau,nu,payers,payRate,revenue});
+  const playMin=42+rnd()*11+(i%14<2?5:0);
+  const sess=Math.round(dau*(1.8+rnd()*0.7));
+  const dateStr=d.toISOString().slice(0,10);
+  data.push({date:dateStr.slice(5),full:dateStr,dau,nu,payers,payRate,arppu,revenue,playMin,sess,
+    ev:EVENTS.find(e=>e.day===i)});
 }
 
-function avg(k,n){const s=data.slice(-n);return s.reduce((a,x)=>a+x[k],0)/n}
-const last7=avg('dau',7),prev7=avg('dau',14)/1, _prev=data.slice(-14,-7).reduce((a,x)=>a+x.dau,0)/7;
-const rev30=data.slice(-30).reduce((a,x)=>a+x.revenue,0);
-const payers30=data.slice(-30).reduce((a,x)=>a+x.payers,0);
-const dau30=avg('dau',30);
-// LTV粗算：近30天流水/近30天新增（简化口径，演示）
-const ltv=rev30/data.slice(-30).reduce((a,x)=>a+x.nu,0);
+// 周 Cohort 数据（8 周，指数衰减 + 噪声，D14/D30 自然递减不卡固定值）
+const cohorts=[];
+for(let w=8;w>=1;w--){
+  const n=Math.round(3400+rnd()*1400+w*70);
+  const base=40.5+rnd()*4.5+(9-w)*1.1; // 越新的周 base 越高（新手期持续优化）
+  const decay=0.088+rnd()*0.008;        // 衰减系数
+  const r=d=>{const v=base*Math.exp(-d*decay)+(rnd()-0.5)*1.4;return Math.max(1.5,v);};
+  cohorts.push({label:`W-${w}`,n,
+    r1:r(1),r3:r(3),r7:r(7),r14:r(14),r30:r(30)});
+}
 
-// KPI：进入页面数字从 0 滚动到目标（500ms，不循环）
-const kpiDefs=[
- ['DAU(近7日均)',Math.round(last7),n=>Math.round(n).toLocaleString(),((last7-_prev)/_prev*100)],
- ['日均新增',Math.round(avg('nu',7)),n=>Math.round(n).toLocaleString(),null],
- ['付费率',avg('payRate',7)*100,n=>n.toFixed(2)+'%',null],
- ['ARPPU',avg('revenue',7)/avg('payers',7),n=>'¥'+Math.round(n),null],
- ['30天流水',rev30/10000,n=>'¥'+n.toFixed(1)+'万',null],
- ['新增LTV(30日)',ltv,n=>'¥'+n.toFixed(1),null]
+// 付费档位分布（近30日）
+const tiers=[
+  ['648 元',14.2,'#f471b5'],
+  ['328 元',22.8,'#a78bfa'],
+  ['128 元',28.5,'#22d3ee'],
+  ['68 元',18.6,'#38bdf8'],
+  ['≤30 元',15.9,'#64748b'],
 ];
-document.getElementById('kpis').innerHTML=kpiDefs.map(([l,num,fmt,d])=>
- `<div class="kpi"><div class="val">0</div><div class="lab">${l}</div>
-${d!==null?`<div class="delta ${d>=0?'up':'down'}">${d>=0?'▲':'▼'} ${Math.abs(d).toFixed(1)}% 环比</div>`:''}</div>`).join('');
-(function(){
-  const els=document.querySelectorAll('#kpis .val');
-  const t0=performance.now(),DUR=500;
-  requestAnimationFrame(function tick(now){
-    const t=Math.min(1,(now-t0)/DUR),e=1-Math.pow(1-t,3);
-    kpiDefs.forEach((d,i)=>{els[i].textContent=d[2](d[1]*e)});
-    if(t<1)requestAnimationFrame(tick);
-    else kpiDefs.forEach((d,i)=>{els[i].textContent=d[2](d[1])});
-  });
-})();
 
-function lineChart(el,series,w,h,legend){
-  const W=w,H=h,L=46,B=26,T=12,R=14;
-  const all=series.flatMap(s=>s.data),max=Math.max(...all)*1.05;
+// LTV 曲线（D1–D30）
+const ltvData=[2.1,4.3,7.4,9.8,12.0,14.1,16.0,17.9,19.8,21.6,23.4,25.2,27.0,28.8,30.6,32.4,34.3,36.2,38.1,40.1,42.1,44.1,46.1,48.2,50.3,52.4,54.5,56.3,57.1,57.3];
+
+// 活动 ROI
+const promos=[
+  {n:'新版本 v2.3 上线',p:'9/28–9/30',cost:6.5,inc:21.8,dauBoost:'+18%',roi:3.35,sug:'保持并复制'},
+  {n:'中秋限时活动',p:'9/17–9/24',cost:4.2,inc:11.6,dauBoost:'+9%',roi:2.76,sug:'保持并复制'},
+  {n:'暑期资料片',p:'8/15–8/22',cost:12.0,inc:18.4,dauBoost:'+22%',roi:1.53,sug:'缩量观察'},
+  {n:'618 充值返利',p:'7/18–7/20',cost:5.8,inc:7.2,dauBoost:'+4%',roi:1.24,sug:'停投改造'},
+];
+
+// RFM 流失预警（按历史充值 / 离线天数 / 挽回 ROI 排序）
+const risks=[
+  {uid:'88421',tier:'鲸鱼',total:8640,days:9,score:92,act:'发放限时 648 元礼包 + 专属客服 1v1 召回'},
+  {uid:'80155',tier:'鲸鱼',total:5320,days:11,score:88,act:'电话回访 + 补偿月卡，排查流失原因'},
+  {uid:'73092',tier:'海豚',total:1260,days:8,score:71,act:'推送新版本内容 + 30 元回归券'},
+  {uid:'91204',tier:'海豚',total:980,days:12,score:65,act:'短信触达回归福利，最后一次召回'},
+  {uid:'69577',tier:'海豚',total:760,days:7,score:58,act:'定向 Push 活动开启 + 好友召回任务'},
+];
+
+/* ============================================================
+   时间切换与派生指标
+   ============================================================ */
+let currentRange=30;
+function sliceData(){return data.slice(-currentRange)}
+function avg(k,n){const s=data.slice(-n);return s.reduce((a,x)=>a+x[k],0)/n}
+function sum(k,n){return data.slice(-n).reduce((a,x)=>a+x[k],0)}
+
+function buildKpis(){
+  const n=currentRange;
+  const dau7=avg('dau',7), dauPrev7=avg('dau',14)/1, dauPrev=data.slice(-14,-7).reduce((a,x)=>a+x.dau,0)/7;
+  const dauChg=(dau7-dauPrev)/dauPrev*100;
+  const nu7=avg('nu',7);
+  const maw=Math.round(avg('dau',30)*2.1); // 简化 MAU 估算
+  const playMin=avg('playMin',7);
+  const rev30=sum('revenue',30), revPrev=data.slice(-60,-30).reduce((a,x)=>a+x.revenue,0);
+  const revChg=(rev30-revPrev)/revPrev*100;
+  const arpu=rev30/sum('dau',30);
+  const arppu=avg('arppu',7);
+  const payRate=avg('payRate',7)*100;
+  const ltv=rev30/sum('nu',30);
+  const d1=cohorts[cohorts.length-1].r1, d7=cohorts[cohorts.length-1].r7;
+  const d1Chg=d1-cohorts[0].r1, d7Chg=d7-cohorts[0].r7;
+  const ret1=cohorts[cohorts.length-1].r1;
+
+  return {
+    scale:[
+      ['DAU(7日均)',Math.round(dau7),dauChg,'环比'],
+      ['MAU(估算)',maw,null,''],
+      ['日均新增',Math.round(nu7),null,''],
+      ['人均时长',playMin.toFixed(1)+' 分钟',null,''],
+    ],
+    revenue:[
+      ['30日流水','¥'+(rev30/10000).toFixed(1)+'万',revChg,'环比'],
+      ['ARPU','¥'+arpu.toFixed(1),null,''],
+      ['ARPPU','¥'+Math.round(arppu),null,''],
+      ['付费率',payRate.toFixed(2)+'%',null,''],
+    ],
+    quality:[
+      ['D1 留存',d1.toFixed(1)+'%',d1Chg,'vs W-8'],
+      ['D7 留存',d7.toFixed(1)+'%',d7Chg,'vs W-8'],
+      ['新增 LTV(30日)','¥'+ltv.toFixed(1),null,''],
+      ['7日活跃率',(avg('sess',7)/avg('dau',7)*100/3).toFixed(0)+'%',null,'简化口径'],
+    ],
+  };
+}
+
+function renderKpis(){
+  const k=buildKpis();
+  const mk=arr=>arr.map(([lab,val,chg,suffix])=>{
+    const delta=chg===null?'':`<div class="delta ${chg>=0?'up':'down'}">${chg>=0?'▲':'▼'} ${Math.abs(chg).toFixed(1)}% ${suffix}</div>`;
+    return `<div class="kpi-item"><div class="val">${val}</div><div class="lab">${lab}</div>${delta}</div>`;
+  }).join('');
+  document.getElementById('kpi-scale').innerHTML=mk(k.scale);
+  document.getElementById('kpi-revenue').innerHTML=mk(k.revenue);
+  document.getElementById('kpi-quality').innerHTML=mk(k.quality);
+}
+
+/* ============================================================
+   图表工具
+   ============================================================ */
+function lineChart(el,series,w,h,legend,events){
+  const W=w,H=h,L=48,B=28,T=14,R=16;
+  const all=series.flatMap(s=>s.data),max=Math.max(...all)*1.08;
   const X=i=>L+i*(W-L-R)/(series[0].data.length-1),Y=v=>T+(H-T-B)*(1-v/max);
   const fid='glow'+Math.random().toString(36).slice(2,8);
-  let defs=`<filter id="${fid}" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation="2.4" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>`;
+  let defs=`<filter id="${fid}" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation="2.2" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>`;
   let svg='';
-  [0,.25,.5,.75,1].forEach(g=>{const y=Y(max*g);svg+=`<line x1="${L}" y1="${y}" x2="${W-R}" y2="${y}" stroke="rgba(255,255,255,0.06)"/><text x="4" y="${y+4}" font-size="9" fill="rgba(255,255,255,0.55)">${Math.round(max*g/1000)}k</text>`});
-  [0,.33,.66,1].forEach(g=>{const i=Math.round(g*(series[0].data.length-1));svg+=`<text x="${X(i)}" y="${H-6}" font-size="9" fill="rgba(255,255,255,0.55)" text-anchor="middle">${data[i].date.slice(5)}</text>`});
+  [0,.25,.5,.75,1].forEach(g=>{const y=Y(max*g);svg+=`<line x1="${L}" y1="${y}" x2="${W-R}" y2="${y}" stroke="rgba(255,255,255,0.06)"/><text x="${L-8}" y="${y+4}" font-size="9.5" fill="rgba(255,255,255,0.5)" text-anchor="end">${Math.round(max*g/1000)}k</text>`});
+  const step=Math.ceil(series[0].data.length/6);
+  series[0].data.forEach((_,i)=>{if(i%step===0||i===series[0].data.length-1){const d=data[data.length-series[0].data.length+i];svg+=`<text x="${X(i)}" y="${H-8}" font-size="9.5" fill="rgba(255,255,255,0.5)" text-anchor="middle">${d.date.slice(5)}</text>`}});
   series.forEach((s,si)=>{
     if(s.area){
       const gid=fid+'a'+si;
-      defs+=`<linearGradient id="${gid}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${s.color}" stop-opacity=".2"/><stop offset="1" stop-color="${s.color}" stop-opacity="0"/></linearGradient>`;
+      defs+=`<linearGradient id="${gid}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${s.color}" stop-opacity=".22"/><stop offset="1" stop-color="${s.color}" stop-opacity="0"/></linearGradient>`;
       const base=Y(0).toFixed(1);
       const ap=s.data.map((v,i)=>(i?'L':'M')+X(i).toFixed(1)+' '+Y(v).toFixed(1)).join(' ')+` L ${X(s.data.length-1).toFixed(1)} ${base} L ${X(0).toFixed(1)} ${base} Z`;
       svg+=`<path d="${ap}" fill="url(#${gid})"/>`;
@@ -204,50 +403,125 @@ function lineChart(el,series,w,h,legend){
     const p=s.data.map((v,i)=>(i?'L':'M')+X(i).toFixed(1)+' '+Y(v).toFixed(1)).join(' ');
     svg+=`<path d="${p}" fill="none" stroke="${s.color}" stroke-width="1.8" filter="url(#${fid})" stroke-linejoin="round" stroke-linecap="round"/>`;
   });
+  // 事件标注
+  if(events){
+    events.forEach(ev=>{
+      const idx=data.length-series[0].data.length+ (DAYS-1-ev.day);
+      if(idx<0||idx>=series[0].data.length) return;
+      const x=X(idx);
+      svg+=`<line x1="${x.toFixed(1)}" y1="${T}" x2="${x.toFixed(1)}" y2="${H-B}" stroke="rgba(245,166,35,.5)" stroke-dasharray="3 3"/>`;
+      svg+=`<text x="${x.toFixed(1)}" y="${T+8}" font-size="9.5" fill="#f5a623" text-anchor="middle">▲ ${ev.name}</text>`;
+    });
+  }
   const lg=legend?`<div class="legend">${legend.map(x=>`<span><i style="background:${x.c}"></i>${x.t}</span>`).join('')}</div>`:'';
   el.innerHTML=lg+`<svg viewBox="0 0 ${W} ${H}" width="100%"><defs>${defs}</defs>${svg}</svg>`;
 }
-lineChart(document.getElementById('dauChart'),[
- {data:data.map(x=>x.dau),color:'#22d3ee',area:true},
- {data:data.map(x=>x.nu),color:'#a78bfa'}
-],680,240,[{c:'#22d3ee',t:'DAU'},{c:'#a78bfa',t:'新增用户'}]);
-lineChart(document.getElementById('revChart'),[
- {data:data.map(x=>x.revenue),color:'#ff5c7a',area:true}
-],470,240,[{c:'#ff5c7a',t:'每日流水（元）'}]);
 
-// 留存矩阵（演示，按周递减+轻微改善）
-const cohorts=[];
-for(let w=8;w>=1;w--){
-  const n=Math.round(3200+rnd()*1500+w*80);
-  const base=40+rnd()*6+(9-w)*0.8;
-  const r=d=>Math.max(8,base-d*4.6-rnd()*3);
-  cohorts.push({label:`W-${w}`,n,r1:r(1),r3:r(3),r7:r(7),r14:r(14),r30:r(30)});
+/* ============================================================
+   营收与付费率双轴图
+   ============================================================ */
+function renderRev(){
+  const d=sliceData();
+  const rev=d.map(x=>x.revenue);
+  const pr=d.map(x=>x.payRate*100);
+  const W=700,H=250,L=50,B=28,T=16,R=52;
+  const iw=W-L-R, ih=H-T-B;
+  const rMax=Math.max(...rev)*1.12, pMax=Math.max(...pr)*1.3;
+  const X=i=>L+i*(iw)/(d.length-1),Y=v=>T+ih*(1-v/rMax);
+  const Yp=v=>T+ih*(1-v/pMax);
+  const fid='rg'+Math.random().toString(36).slice(2,7);
+  const defs=`<filter id="${fid}" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation="2.4" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+    <linearGradient id="${fid}g" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ff5c7a" stop-opacity=".28"/><stop offset="1" stop-color="#ff5c7a" stop-opacity="0"/></linearGradient>`;
+  let svg='';
+  [0,.25,.5,.75,1].forEach(g=>{const y=Y(rMax*g);svg+=`<line x1="${L}" y1="${y.toFixed(1)}" x2="${W-R}" y2="${y.toFixed(1)}" stroke="rgba(255,255,255,0.06)"/><text x="${L-8}" y="${(y+4).toFixed(1)}" font-size="9.5" fill="rgba(255,255,255,0.5)" text-anchor="end">${(rMax*g/10000).toFixed(0)}万</text>`});
+  for(let i=0;i<=4;i++){const v=pMax*i/4;const y=Yp(v);svg+=`<text x="${W-R+8}" y="${(y+4).toFixed(1)}" font-size="9.5" fill="#fbbf24">${v.toFixed(1)}%</text>`}
+  const step=Math.ceil(d.length/7);
+  d.forEach((x,i)=>{if(i%step===0||i===d.length-1){svg+=`<text x="${X(i).toFixed(1)}" y="${H-8}" font-size="9.5" fill="rgba(255,255,255,0.5)" text-anchor="middle">${x.date.slice(5)}</text>`}});
+  // 流水柱
+  const bw=iw/d.length*0.55;
+  rev.forEach((v,i)=>{const y=Y(v);svg+=`<rect x="${(X(i)-bw/2).toFixed(1)}" y="${y.toFixed(1)}" width="${bw.toFixed(1)}" height="${(T+ih-y).toFixed(1)}" rx="2.5" fill="url(#${fid}g)" stroke="rgba(255,92,122,.7)"/>`});
+  // 付费率线
+  const p=pr.map((v,i)=>(i?'L':'M')+X(i).toFixed(1)+' '+Yp(v).toFixed(1)).join(' ');
+  svg+=`<path d="${p}" fill="none" stroke="#fbbf24" stroke-width="2" filter="url(#${fid})" stroke-linejoin="round"/>`;
+  // 事件
+  const off=data.length-d.length;
+  d.forEach((x,i)=>{if(x.ev){const xx=X(i);svg+=`<line x1="${xx.toFixed(1)}" y1="${T}" x2="${xx.toFixed(1)}" y2="${H-B}" stroke="rgba(34,211,238,.45)" stroke-dasharray="3 3"/>`;svg+=`<text x="${xx.toFixed(1)}" y="${T+9}" font-size="9" fill="#7ee9fb" text-anchor="middle">▲${x.ev.name}</text>`}});
+  const lg=`<div class="legend"><span><i style="background:#ff5c7a"></i>日流水（万元）</span><span><i style="background:#fbbf24"></i>付费率（%）</span></div>`;
+  document.getElementById('revChart').innerHTML=lg+`<svg viewBox="0 0 ${W} ${H}" width="100%"><defs>${defs}</defs>${svg}</svg>`;
 }
-const cell=v=>{const t=Math.min(1,Math.max(0,v/48));
-  const a=(0.07+t*0.83).toFixed(2),c=t>0.55?'#052733':'#d9f6ff';
-  return `<td style="background:rgba(34,211,238,${a});color:${c};border-radius:4px">${v.toFixed(1)}%</td>`};
-document.querySelector('#cohort tbody').innerHTML=cohorts.map(c=>
- `<tr><td>${c.label}</td><td>${c.n.toLocaleString()}</td>${cell(c.r1)}${cell(c.r3)}${cell(c.r7)}${cell(c.r14)}${cell(c.r30)}</tr>`).join('');
 
-// 付费分层
-const totalUsers=dau30;
-const seg=[
- ['鲸鱼',0.8,'#f471b5',rev30*0.42],
- ['海豚',6.5,'#a78bfa',rev30*0.38],
- ['小鱼',13.7,'#22d3ee',rev30*0.20],
- ['非付费',79.0,'rgba(255,255,255,0.16)',0]
-];
-const maxPct=Math.max(...seg.map(s=>s[1]));
-document.getElementById('seg').innerHTML=seg.map(([n,p,color,rev])=>
- `<div class="segrow"><span class="nm">${n}</span>
- <div class="segbar"><i style="width:${p/maxPct*100}%;background:${color}"></i></div>
- <b>${p}% · 流水¥${(rev/10000).toFixed(1)}万</b></div>`).join('');
+/* ============================================================
+   用户构成（DAU 堆叠柱 + 新增 + 时长线）
+   ============================================================ */
+function renderDau(){
+  const d=sliceData();
+  const W=520,H=250,L=48,B=28,T=16,R=16;
+  const iw=W-L-R, ih=H-T-B;
+  const dauMax=Math.max(...d.map(x=>x.dau))*1.12;
+  const pmMax=Math.max(...d.map(x=>x.playMin))*1.15;
+  const X=i=>L+i*(iw)/(d.length-1),Y=v=>T+ih*(1-v/dauMax),Yp=v=>T+ih*(1-v/pmMax);
+  const fid='dg'+Math.random().toString(36).slice(2,7);
+  const defs=`<filter id="${fid}" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation="2" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+    <linearGradient id="${fid}c" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#22d3ee" stop-opacity=".3"/><stop offset="1" stop-color="#22d3ee" stop-opacity="0"/></linearGradient>`;
+  let svg='';
+  [0,.25,.5,.75,1].forEach(g=>{const y=Y(dauMax*g);svg+=`<line x1="${L}" y1="${y.toFixed(1)}" x2="${W-R}" y2="${y.toFixed(1)}" stroke="rgba(255,255,255,0.06)"/><text x="${L-8}" y="${(y+4).toFixed(1)}" font-size="9.5" fill="rgba(255,255,255,0.5)" text-anchor="end">${Math.round(dauMax*g/1000)}k</text>`});
+  const step=Math.ceil(d.length/6);
+  d.forEach((x,i)=>{if(i%step===0||i===d.length-1){svg+=`<text x="${X(i).toFixed(1)}" y="${H-8}" font-size="9.5" fill="rgba(255,255,255,0.5)" text-anchor="middle">${x.date.slice(5)}</text>`}});
+  const pts=d.map((x,i)=>[X(i),Y(x.dau)]);
+  const ap=pts.map((p,i)=>(i?'L':'M')+p[0].toFixed(1)+' '+p[1].toFixed(1)).join(' ')+` L ${pts[pts.length-1][0].toFixed(1)} ${Y(0).toFixed(1)} L ${pts[0][0].toFixed(1)} ${Y(0).toFixed(1)} Z`;
+  svg+=`<path d="${ap}" fill="url(#${fid}c)"/>`;
+  svg+=`<path d="${pts.map((p,i)=>(i?'L':'M')+p[0].toFixed(1)+' '+p[1].toFixed(1)).join(' ')}" fill="none" stroke="#22d3ee" stroke-width="2" filter="url(#${fid})"/>`;
+  // 新增柱
+  const bw=iw/d.length*0.4;
+  d.forEach((x,i)=>{const y=Y(x.nu);svg+=`<rect x="${(X(i)-bw/2).toFixed(1)}" y="${y.toFixed(1)}" width="${bw.toFixed(1)}" height="${(T+ih-y).toFixed(1)}" rx="2" fill="rgba(167,139,250,.35)" stroke="rgba(167,139,250,.7)"/>`});
+  const lg=`<div class="legend"><span><i style="background:#22d3ee"></i>DAU</span><span><i style="background:#a78bfa"></i>日均新增</span></div>`;
+  document.getElementById('dauChart').innerHTML=lg+`<svg viewBox="0 0 ${W} ${H}" width="100%"><defs>${defs}</defs>${svg}</svg>`;
+}
 
-// 新手转化漏斗（下载→注册→创建角色→完成新手引导→次日回访D1）
-(function(){
-  const stages=[['下载',100],['注册',85],['创建角色',72],['完成新手引导',54],['次日回访',41]];
-  const W=680,H=296,cx=270,top=14,rh=50,hwMax=182,steep=2;
-  const cols=['#22d3ee','#38bdf8','#818cf8','#a78bfa','#c084fc'];
+/* ============================================================
+   Cohort 热力矩阵
+   ============================================================ */
+function renderCohort(){
+  const cell=v=>{const t=Math.min(1,Math.max(0,v/50));
+    const a=(0.06+t*0.85).toFixed(2),c=t>0.55?'#052733':'#d9f6ff';
+    return `<td style="background:rgba(34,211,238,${a});color:${c};border-radius:4px;font-weight:${v>=30?600:400}">${v.toFixed(1)}%</td>`};
+  document.querySelector('#cohort tbody').innerHTML=cohorts.map(c=>
+   `<tr><td>${c.label}</td><td>${c.n.toLocaleString()}</td>${cell(c.r1)}${cell(c.r3)}${cell(c.r7)}${cell(c.r14)}${cell(c.r30)}</tr>`).join('');
+}
+
+/* ============================================================
+   留存曲线
+   ============================================================ */
+function renderRet(){
+  const W=520,H=250,L=46,B=28,T=14,R=16;
+  const iw=W-L-R, ih=H-T-B;
+  const days=[1,3,7,14,30];
+  const max=50;
+  const X=v=>L+iw*(Math.log(v)/Math.log(30)),Y=v=>T+ih*(1-v/max);
+  const colors=['#22d3ee','#a78bfa','#fbbf24','#f471b5'];
+  const picks=cohorts.slice(-4);
+  const fid='ret'+Math.random().toString(36).slice(2,7);
+  let defs=`<filter id="${fid}" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation="1.8" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>`;
+  let svg='';
+  [0,12.5,25,37.5,50].forEach(g=>{const y=Y(g);svg+=`<line x1="${L}" y1="${y.toFixed(1)}" x2="${W-R}" y2="${y.toFixed(1)}" stroke="rgba(255,255,255,0.06)"/><text x="${L-8}" y="${(y+4).toFixed(1)}" font-size="9.5" fill="rgba(255,255,255,0.5)" text-anchor="end">${g}%</text>`});
+  days.forEach(d=>{svg+=`<text x="${X(d).toFixed(1)}" y="${H-8}" font-size="9.5" fill="rgba(255,255,255,0.5)" text-anchor="middle">D${d}</text>`});
+  picks.forEach((c,ci)=>{
+    const vals=[c.r1,c.r3,c.r7,c.r14,c.r30];
+    const p=vals.map((v,i)=>(i?'L':'M')+X(days[i]).toFixed(1)+' '+Y(v).toFixed(1)).join(' ');
+    svg+=`<path d="${p}" fill="none" stroke="${colors[ci]}" stroke-width="1.8" filter="url(#${fid})" stroke-linejoin="round"/>`;
+    vals.forEach((v,i)=>{svg+=`<circle cx="${X(days[i]).toFixed(1)}" cy="${Y(v).toFixed(1)}" r="3" fill="#070b1a" stroke="${colors[ci]}" stroke-width="1.5"/>`});
+  });
+  const lg=`<div class="legend">${picks.map((c,i)=>`<span><i style="background:${colors[i]}"></i>${c.label} (${c.r1.toFixed(0)}%/${c.r7.toFixed(0)}%/${c.r30.toFixed(0)}%)</span>`).join('')}</div>`;
+  document.getElementById('retChart').innerHTML=lg+`<svg viewBox="0 0 ${W} ${H}" width="100%"><defs>${defs}</defs>${svg}</svg>`;
+}
+
+/* ============================================================
+   付费漏斗
+   ============================================================ */
+function renderFunnel(){
+  const stages=[['下载',100],['注册',86],['创建角色',73],['完成新手引导',55],['首日付费',21]];
+  const W=560,H=300,cx=230,top=16,rh=52,hwMax=170;
+  const cols=['#22d3ee','#38bdf8','#818cf8','#a78bfa','#f471b5'];
   const hw=r=>hwMax*r/100;
   let svg='';
   stages.forEach((s,i)=>{
@@ -257,27 +531,49 @@ document.getElementById('seg').innerHTML=seg.map(([n,p,color,rev])=>
     svg+=`<text x="${cx}" y="${(y1+y2)/2+4}" text-anchor="middle" font-size="12.5" font-weight="600" fill="#f2fbff">${s[0]} ${s[1]}%</text>`;
   });
   for(let i=0;i<stages.length-1;i++){
-    const y=top+(i+1)*rh,rate=stages[i+1][1]/stages[i][1]*100,st=i===steep;
-    svg+=`<text x="${cx-hw(stages[i][1])-8}" y="${y+4}" text-anchor="end" font-size="10.5" font-weight="${st?700:400}" fill="${st?'#ff5c7a':'rgba(255,255,255,0.55)'}">↓ ${rate.toFixed(1)}%</text>`;
+    const y=top+(i+1)*rh,rate=stages[i+1][1]/stages[i][1]*100,worst=i===3;
+    svg+=`<text x="${cx-hw(stages[i][1])-10}" y="${y+5}" text-anchor="end" font-size="10.5" font-weight="${worst?700:400}" fill="${worst?'#ff5c7a':'rgba(255,255,255,0.55)'}">↓ ${rate.toFixed(1)}%</text>`;
   }
-  const ay=top+(steep+1)*rh;
-  svg+=`<text x="472" y="${ay-6}" font-size="12" font-weight="700" fill="#ff5c7a">最大流失点</text>`;
-  svg+=`<text x="472" y="${ay+12}" font-size="10.5" fill="#ffb9c6">建议排查新手引导第 3 步</text>`;
+  const ay=top+4*rh;
+  svg+=`<text x="${cx+hwMax+18}" y="${ay-4}" font-size="12" font-weight="700" fill="#ff5c7a">最大流失点</text>`;
+  svg+=`<text x="${cx+hwMax+18}" y="${ay+14}" font-size="10.5" fill="#ffb9c6">完成引导 → 首日付费</text>`;
+  svg+=`<text x="${cx+hwMax+18}" y="${ay+30}" font-size="10.5" fill="#ffb9c6">级间转化 38.2%</text>`;
   document.getElementById('funnel').innerHTML=`<svg viewBox="0 0 ${W} ${H}" width="100%">${svg}</svg>`;
-})();
+}
 
-// 新增用户 LTV 曲线（D1–D30，终点与 KPI「新增LTV ¥57.3」一致）
-(function(){
-  const ltvData=[2.1,4.2,7.2,9.6,11.8,14.0,16.0,17.8,19.6,21.3,22.9,24.5,26.2,27.8,29.5,31.2,32.9,34.6,36.4,38.2,40.1,42.0,43.9,45.9,47.9,50.0,52.1,54.2,56.0,57.3];
-  const W=620,H=260,L=46,B=28,T=14,R=16,max=60,n=ltvData.length;
+/* ============================================================
+   付费档位
+   ============================================================ */
+function renderTier(){
+  const max=Math.max(...tiers.map(t=>t[1]));
+  document.getElementById('tier').innerHTML=tiers.map(t=>
+   `<div class="segrow"><span class="nm">${t[0]}</span>
+    <div class="segbar"><i style="width:${t[1]/max*100}%;background:${t[2]}"></i></div>
+    <b>${t[1]}% 笔数占比</b></div>`).join('');
+}
+
+/* ============================================================
+   LTV 曲线 + 回本线
+   ============================================================ */
+function renderLtv(){
+  const W=560,H=260,L=46,B=28,T=14,R=16,max=62,n=ltvData.length;
   const X=i=>L+i*(W-L-R)/(n-1),Y=v=>T+(H-T-B)*(1-v/max);
   const fid='ltv'+Math.random().toString(36).slice(2,7);
-  const defs=`<filter id="${fid}" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation="2.6" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
-  <linearGradient id="${fid}f" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#22d3ee" stop-opacity=".25"/><stop offset="1" stop-color="#22d3ee" stop-opacity="0"/></linearGradient>
-  <linearGradient id="${fid}l" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#22d3ee"/><stop offset="1" stop-color="#a78bfa"/></linearGradient>`;
+  const cac=28; // 假设单用户获客成本
+  const defs=`<filter id="${fid}" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation="2.4" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+    <linearGradient id="${fid}f" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#22d3ee" stop-opacity=".22"/><stop offset="1" stop-color="#22d3ee" stop-opacity="0"/></linearGradient>
+    <linearGradient id="${fid}l" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#22d3ee"/><stop offset="1" stop-color="#a78bfa"/></linearGradient>`;
   let svg='';
-  [0,15,30,45,60].forEach(g=>{const y=Y(g);svg+=`<line x1="${L}" y1="${y}" x2="${W-R}" y2="${y}" stroke="rgba(255,255,255,0.06)"/><text x="4" y="${y+4}" font-size="9.5" fill="rgba(255,255,255,0.55)">¥${g}</text>`});
+  [0,15,30,45,60].forEach(g=>{const y=Y(g);svg+=`<line x1="${L}" y1="${y}" x2="${W-R}" y2="${y}" stroke="rgba(255,255,255,0.06)"/><text x="${L-8}" y="${y+4}" font-size="9.5" fill="rgba(255,255,255,0.55)" text-anchor="end">¥${g}</text>`});
   [1,5,10,15,20,25,30].forEach(d=>{svg+=`<text x="${X(d-1)}" y="${H-8}" font-size="9.5" fill="rgba(255,255,255,0.55)" text-anchor="middle">D${d}</text>`});
+  // CAC 回本线
+  const yc=Y(cac);
+  svg+=`<line x1="${L}" y1="${yc}" x2="${W-R}" y2="${yc}" stroke="rgba(244,113,181,.5)" stroke-dasharray="5 4"/>`;
+  svg+=`<text x="${W-R}" y="${yc-5}" font-size="10" fill="#f471b5" text-anchor="end">CAC ¥${cac}（回本线）</text>`;
+  // 找回本天数
+  let payback=ltvData.findIndex(v=>v>=cac)+1;
+  if(payback>0){const x=X(payback-1);svg+=`<circle cx="${x}" cy="${yc}" r="4" fill="#f471b5"/><text x="${x+8}" y="${yc-10}" font-size="10" fill="#f471b5">D${payback} 回本</text>`}
+  // LTV 曲线
   const pts=ltvData.map((v,i)=>[X(i),Y(v)]);
   let p=`M ${pts[0][0].toFixed(1)} ${pts[0][1].toFixed(1)}`;
   for(let i=1;i<n-1;i++){const mx=(pts[i][0]+pts[i+1][0])/2,my=(pts[i][1]+pts[i+1][1])/2;p+=` Q ${pts[i][0].toFixed(1)} ${pts[i][1].toFixed(1)} ${mx.toFixed(1)} ${my.toFixed(1)}`;}
@@ -286,22 +582,128 @@ document.getElementById('seg').innerHTML=seg.map(([n,p,color,rev])=>
   svg+=`<path d="${p}" fill="none" stroke="url(#${fid}l)" stroke-width="2.2" filter="url(#${fid})" stroke-linecap="round"/>`;
   [[7,'D7 ¥16.0','middle',-12],[30,'D30 ¥57.3','end',-12]].forEach(([d,t,anch,dy])=>{
     const x=X(d-1),y=Y(ltvData[d-1]);
-    svg+=`<circle cx="${x}" cy="${y}" r="3.6" fill="#0a0e1f" stroke="#22d3ee" stroke-width="2"/>`;
+    svg+=`<circle cx="${x}" cy="${y}" r="3.6" fill="#070b1a" stroke="#22d3ee" stroke-width="2"/>`;
     svg+=`<text x="${x}" y="${y+dy}" font-size="11" font-weight="700" fill="#e9fbff" text-anchor="${anch}">${t}</text>`;
   });
   document.getElementById('ltvChart').innerHTML=`<svg viewBox="0 0 ${W} ${H}" width="100%"><defs>${defs}</defs>${svg}</svg>`;
-})();
+}
 
-// 流失风险名单（演示）
-const risks=[
- ['UID 88421','鲸鱼','历史充值¥8,640','已9天未登录','发放限时648元礼包+专属客服1v1召回'],
- ['UID 73092','海豚','历史充值¥1,260','已8天未登录','推送新版本内容+30元回归券'],
- ['UID 80155','鲸鱼','历史充值¥5,320','已11天未登录','电话回访+补偿月卡，排查流失原因'],
- ['UID 69577','海豚','历史充值¥760','已7天未登录','定向Push活动开启+好友召回任务'],
- ['UID 91204','海豚','历史充值¥980','已12天未登录','短信触达回归福利，最后一次召回']
-];
-document.getElementById('risks').innerHTML=risks.map(r=>
- `<div class="risk"><b>${r[0]}</b>（${r[1]}）｜${r[2]}｜${r[3]} → <span style="color:#f5a623">${r[4]}</span></div>`).join('');
+/* ============================================================
+   付费分层
+   ============================================================ */
+function renderSeg(){
+  const rev30=sum('revenue',30);
+  const seg=[
+    ['鲸鱼',0.8,'#f471b5',rev30*0.42],
+    ['海豚',6.5,'#a78bfa',rev30*0.38],
+    ['小鱼',13.7,'#22d3ee',rev30*0.20],
+    ['非付费',79.0,'rgba(255,255,255,0.14)',0]
+  ];
+  const maxPct=Math.max(...seg.map(s=>s[1]));
+  document.getElementById('seg').innerHTML=seg.map(([n,p,color,rev])=>
+   `<div class="segrow"><span class="nm">${n}</span>
+    <div class="segbar"><i style="width:${p/maxPct*100}%;background:${color}"></i></div>
+    <b>${p}% · 流水 ¥${(rev/10000).toFixed(1)}万</b></div>`).join('');
+}
+
+/* ============================================================
+   活动 ROI
+   ============================================================ */
+function renderPromo(){
+  const badge=roi=>roi>=2?'<span style="color:#34d399;font-weight:600">保持并复制</span>'
+    :roi>=1.5?'<span style="color:#fbbf24;font-weight:600">缩量观察</span>'
+    :'<span style="color:#f87171;font-weight:600">停投改造</span>';
+  document.querySelector('#promo tbody').innerHTML=promos.map(p=>{
+    const roi=p.inc/p.cost;
+    return `<tr><td>${p.n}</td><td>${p.p}</td><td class="num">${p.cost.toFixed(1)}</td>
+      <td class="num">${p.inc.toFixed(1)}</td>
+      <td class="num" style="font-weight:700;color:${roi>=2?'#34d399':roi>=1.5?'#fbbf24':'#f87171'}">${roi.toFixed(2)}</td>
+      <td class="num">${p.dauBoost}</td><td>${badge(roi)}</td></tr>`;
+  }).join('');
+}
+
+/* ============================================================
+   RFM 预警
+   ============================================================ */
+function renderRisks(){
+  document.getElementById('risks').innerHTML=risks.map(r=>{
+    const lvl=r.score>=80?'high':r.score>=65?'high':'mid';
+    const lvlText=r.score>=80?'极高风险':'高风险';
+    return `<div class="risk"><b>UID ${r.uid}</b>（${r.tier}）｜历史充值 ¥${r.total.toLocaleString()}｜已 ${r.days} 天未登录
+      <span class="lvl lvl-${lvl}">${lvlText} · 风险分 ${r.score}</span><br>
+      <span class="act">→ ${r.act}</span></div>`;
+  }).join('');
+}
+
+/* ============================================================
+   动作中心（规则引擎）
+   ============================================================ */
+function buildActions(){
+  const latestC=cohorts[cohorts.length-1];
+  const bestC=[...cohorts].sort((a,b)=>b.r7-a.r7)[0];
+  const d1Chg=latestC.r1-cohorts[0].r1;
+  const rev30=sum('revenue',30);
+  const actions=[];
+  // 1. 鲸鱼流失
+  const whaleAtRisk=risks.filter(r=>r.tier==='鲸鱼').length;
+  actions.push(['a-red','鲸鱼流失预警',`${whaleAtRisk} 位鲸鱼用户超 7 天未登录，潜在流失流水 ¥${risks.filter(r=>r.tier==='鲸鱼').reduce((a,r)=>a+r.total,0).toLocaleString()}`,
+    '立即启动 1v1 召回：专属客服 + 限时 648 礼包','预估挽回 ROI 3.2']);
+  // 2. 新手漏斗
+  actions.push(['a-amber','新手期付费转化偏低','完成引导 → 首日付费级间转化仅 38.2%，低于行业中位 45%',
+    '在新手引导结束节点投放首充 6 元礼包，降低首充决策门槛','预估提升首日付费率 1.2pp']);
+  // 3. D7 留存
+  if(latestC.r7<22){
+    actions.push(['a-red','D7 留存预警',`最新 W-1 的 D7 留存 ${latestC.r7.toFixed(1)}%，低于健康线 22%`,
+      '排查前 10 分钟体验卡点，增加第 3 天登录奖励与社交邀请任务','预估 D7 提升 3–5pp']);
+  }else{
+    actions.push(['a-green','留存持续改善',`W-1 的 D1 ${latestC.r1.toFixed(1)}% / D7 ${latestC.r7.toFixed(1)}%，较 W-8 分别提升 ${d1Chg.toFixed(1)}pp / ${(latestC.r7-cohorts[0].r7).toFixed(1)}pp`,
+      '沉淀新手期优化 SOP，作为后续版本留存基线','已验证有效']);
+  }
+  // 4. 活动 ROI
+  const badPromo=promos.find(p=>p.inc/p.cost<1.5);
+  if(badPromo) actions.push(['a-blue','活动 ROI 优化',`「${badPromo.n}」ROI 仅 ${(badPromo.inc/badPromo.cost).toFixed(2)}，低于 1.5 阈值`,
+    '复盘活动素材与投放渠道，下轮同类型活动预算下调 30%','节省预算 ¥'+(badPromo.cost*0.3).toFixed(1)+'万']);
+  // 5. 标杆复制
+  if(bestC.r7>=15) actions.push(['a-green','标杆周复制',`${bestC.label} 的 D7 留存 ${bestC.r7.toFixed(1)}% 为近 8 周最高`,
+    '提取当周运营动作（活动/版本/投放）形成可复制 SOP','可作为下月版本参考']);
+  return actions;
+}
+function renderActions(){
+  document.getElementById('actions').innerHTML=buildActions().map(a=>
+   `<div class="acard ${a[0]}"><b>${a[1]}<span class="badge">优先级 ${a[0].slice(2).toUpperCase()}</span></b>
+    <div style="color:rgba(255,255,255,.72)">${a[2]}</div>
+    <div style="margin-top:6px;color:#e2e8f7">💡 ${a[3]}</div>
+    <span class="roi">${a[4]}</span></div>`).join('');
+}
+
+/* ============================================================
+   时间切换
+   ============================================================ */
+function setRange(days){
+  currentRange=days;
+  document.querySelectorAll('#range button').forEach(b=>b.classList.toggle('active',+b.dataset.r===days));
+  document.getElementById('periodDays').textContent=days;
+  renderKpis();renderRev();renderDau();renderSeg();
+}
+document.getElementById('range').addEventListener('click',e=>{
+  if(e.target.tagName==='BUTTON') setRange(+e.target.dataset.r);
+});
+
+/* ============================================================
+   首屏渲染
+   ============================================================ */
+renderKpis();
+renderRev();
+renderDau();
+renderCohort();
+renderRet();
+renderFunnel();
+renderTier();
+renderLtv();
+renderSeg();
+renderPromo();
+renderRisks();
+renderActions();
 </script>
 </body>
 </html>
